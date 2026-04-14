@@ -1,0 +1,424 @@
+[
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 1,
+    "fields": {
+        "judul": "Praktik Manajemen CSR (tanggung jawab sosial perusahaan) \r\nPT. GGPC Lampung Tengah\r\n",
+        "penulis": " Wildan, Abdurrahman Wildan",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:4",
+        "diambil_pada": "2026-04-13T22:54:45.603Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 2,
+    "fields": {
+        "judul": " \r\nOPTIMASI ALIRAN DAYA MENGGUNAKAN UNIFIED POWER FLOW CONTROL (UPFC) PADA SISTEM TRANSMISI 150 KV WILAYAH \r\n \r\nLAMPUNG ",
+        "penulis": "., EZI HAILI ANANTA ",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:8",
+        "diambil_pada": "2026-04-13T22:54:45.778Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 3,
+    "fields": {
+        "judul": "KETAHANAN KULTIVAR CABAI MERAH (Capsicum annuum L.) TERHADAP JAMUR Colletotrichum capsici (Syd.) Butler & Bisby PENYEBAB PENYAKIT ANTRAKNOSA",
+        "penulis": "Miskun, Arie Regita",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:9",
+        "diambil_pada": "2026-04-13T22:54:45.808Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 4,
+    "fields": {
+        "judul": "STUDI DAYA DUKUNG TANAH ORGANIK  MENGGUNAKAN MATOS \r\n ",
+        "penulis": "., M. SENDI WIRATAMA ",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:10",
+        "diambil_pada": "2026-04-13T22:54:45.864Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 5,
+    "fields": {
+        "judul": "PERANCANGAN DAN IMPLEMENTASI SISTEM INFORMASI RESTORAN MULTI CABANG \r\nMANAJEMEN TERPUSAT DENGAN MENGGUNAKAN VPN (VIRTUAL PRIVATE NETWORK) \r\n (Studi Kasus di Pondok Santap Glompong) ",
+        "penulis": "., RENDI AGUNG WIJAYA ",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:11",
+        "diambil_pada": "2026-04-13T22:54:45.923Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 6,
+    "fields": {
+        "judul": "RANCANG BANGUN KONVEYOR PENYORTIRAN BARANG DENGAN PENGENALAN POLA BENTUK DAN WARNA MENGGUNAKAN \r\nWE B C A M  ",
+        "penulis": "., Rudi Hasudungan Hutabarat ",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:12",
+        "diambil_pada": "2026-04-13T22:54:45.965Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 7,
+    "fields": {
+        "judul": "RANCANG BANGUN PENGATURAN PAKAN PADA MODEL TAMBAK SECARA OTOMATIS BERBASIS MIKROKONTROLLER ATMEGA32 ",
+        "penulis": "., SINGGIH ANDRIYAWAN ",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:13",
+        "diambil_pada": "2026-04-13T22:54:46.004Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 8,
+    "fields": {
+        "judul": "RANCANG BANGUN SISTEM PAKAR UNTUK MENDIAGNOSA PENYAKIT TANAMAN CABAI \r\nDENGAN METODE FORWARD CHAINING  ",
+        "penulis": "., Anas Anshori ",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:14",
+        "diambil_pada": "2026-04-13T22:54:46.017Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 9,
+    "fields": {
+        "judul": "ANALISA PENTANAHAN NETRAL PADA GARDU INDUK 150 kV PADA SISTEM INTERKONEKSI SUMBAGSEL",
+        "penulis": "., FARDINAN AHMAD",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:15",
+        "diambil_pada": "2026-04-13T22:54:46.031Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 10,
+    "fields": {
+        "judul": "RANCANG BANGUN SIMULATOR ALAT BANTU KESELAMATAN TERPADU PADA KENDARAAN BERDASARKAN SENSOR JARAK DENGAN MENGGUNAKAN MIKROKONTROLER ATMEGA8535 ",
+        "penulis": "., RIYO HARDIYANTO ",
+        "abstrak": null,
+        "tanggal_terbit": null,
+        "sumber": "digilib",
+        "url_asli": "oai:digilib.unila.ac.id:16",
+        "diambil_pada": "2026-04-13T22:54:46.036Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 18,
+    "fields": {
+        "judul": "Pengaruh Citra Merek dan Kesadaran Merek Terhadap Keputusan Pembelian Produk Skintific Pada TikTokshop (Studi Kasus Mahasiswa FEB Universitas Bandar Lampung)",
+        "penulis": "Agnes Nofita Fatmasari, M. S. Barusman",
+        "abstrak": "Studi ini menganalisis pengaruh citra merek dan kesadaran merek terhadap keputusan pembelian produk skincare Skintific melalui Tikok Shop, pada mahasiswa FEB Universitas Bandar Lampung. Metodologi menggunakan teknik kuantitatif yang dilakukan dengan analisis regresi linier berganda. Data telah dikumpulkan dari sembilan puluh responden yang merupakan pengguna aktif TikTok. Temuan didapat citra merek memiliki kontribusi signifikan pada keputusan pembelian. Demikian pula, kesadaran merek berpengaru",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/b34dd09ddfbe8e9e41cc6740982ab0563c162fac",
+        "diambil_pada": "2026-04-14T02:40:41.280Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 19,
+    "fields": {
+        "judul": "Pengaruh Influencer TikTok Awbimax Terhadap Penilaian Sosial Mahasiswa Universitas Lampung",
+        "penulis": "Imam Mahmud, Arif Ainun Na’im, Erna Wahyu Septianna",
+        "abstrak": "Penelitian ini bertujuan untuk menginvestigasi pengaruh influencer TikTok dengan nama akun @Awbimax terhadap penilaian sosial mahasiswa Universitas Lampung. Dalam era media sosial, influencer memiliki peran penting dalam menyebarkan informasi dan memengaruhi perilaku masyarakat, termasuk di antaranya mahasiswa. Penelitian ini dilatarbelakangi oleh fenomena kritik yang dilontarkan oleh Awbimax terhadap kondisi di Provinsi Lampung, yang menciptakan respon dan tanggapan dari masyarakat, termasuk ma",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/e3b5f1dea94cd35345e4e505baa4a11adb986b0d",
+        "diambil_pada": "2026-04-14T02:40:41.348Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 20,
+    "fields": {
+        "judul": "Analisis Implementasi Pengendalian Waktu Dan Biaya Pada Pelaksanaan Pembangunan Gedung C Fkip Tahap III Universitas Lampung Dengan Metode Earned Value",
+        "penulis": "Ike Novita Sari, I. Kustiani, Amril Ma'ruf Siregar",
+        "abstrak": "Sarana dan prasarana menjadi penunjang utama dalam meningkatkan pendidikan di Indonesia. Universitas Lampung melakukan kegiatan rutin yakni pembangunan maupun renovasi gedung-gedung guna menunjang kebutuhan fasilitas pendidikan. Agar kegiatan proyek pembangunan berjalan sesuai jadwal dan sesuai anggaran, maka diperlukan pengendalian proyek seperti pada pembangunan Gedung C FKIP Tahap 3 Universitas Lampung dilakukan dengan menggunakan metode nilai hasil. Tujuan dari penelitian ini adalah menganal",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/a4827ce7564e771f57032d26b14caece2538f525",
+        "diambil_pada": "2026-04-14T02:40:41.358Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 21,
+    "fields": {
+        "judul": "Pengaruh Efikasi Diri Terhadap Kemampuan Menulis Karya Tulis Ilmiah Pada Mahasiswa PPKn FKIP Universitas Lampung",
+        "penulis": "Putri Retno Sari, Yunisca Nurmalisa, S. Susilo, Berchah Pitoewas, N. Nurhayati",
+        "abstrak": "Keyakinan akan kemampuan diri (efikasi diri) yang baik dalam menulis karya ilmiah membuat mahasiswa yakin akan mampu menghasilkan karya ilmiah yang baik dan berkualitas. Hal ini karena efikasi diri dapat memengaruhi motivasi, usaha, dan ketekunan dalam melakukan penelitian yang mendalam, mengumpulkan data yang relevan, dan menyusun argumen yang kuat. Penelitian ini memiliki tujuan untuk meneliti pengaruh efikasi diri terhadap kemampuan menulis karya ilmiah pada mahasiswa PPKn Universitas Lampung",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/1c3d49f229652e07b7ba0cb699fe81199cedb4fc",
+        "diambil_pada": "2026-04-14T02:40:41.366Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 22,
+    "fields": {
+        "judul": "Strategi Networking Berbasis Ilmu Komunikasi: Upaya Mahasiswa KKN Universitas Lampung dalam Mempromosikan Wisata Desa Kecapi",
+        "penulis": "E. Ermawati, Defitriani, Tetri Ayu Nabila, Rehulina Girsang, Niki Nabila Utami, Evandra Athallah Pramana, Muammar Haikal Azzahran, Munti Sarida",
+        "abstrak": "Permasalahan utama yang dihadapi oleh wisata desa kecapi adalah minimnya pengetahuan dalam pemanfaatan public speaking untuk memasarkan wisata belerang simpur di sosial media. Meski demikian, pengelola wisata belerang simpur dan karang taruna menunjukan minat dalam bidang Social Media Marketing (SMM). oleh karena itu, Mahasiswa/i KKN Universitas Lampung Desa Kecapi melaksanakan program kerja yang berjudul Strategi Networking Berbasis Ilmu Komunikasi. Program ini dilaksanakan pada 27 Januari 2025",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/03830781b6c44a58cf2871d8fdb28bd56eddaf07",
+        "diambil_pada": "2026-04-14T02:40:41.381Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 23,
+    "fields": {
+        "judul": "Filter Bubble dan Echo Chamber: Pengaruh Algoritma Media Sosial terhadap Pola Konsumsi Informasi Mahasiswa Universitas Lampung",
+        "penulis": "Dean Mulya Armanda, Dzakia Afaf, Restu Krisdahyanto",
+        "abstrak": "Perkembangan pesat teknologi informasi, terutama di media sosial, telah mengubah cara kita mengakses dan menyebarkan informasi. Di balik kemudahan tersebut, muncul fenomena filter bubble dan echo chamber, yang semakin relevan dengan kehidupan digital saat ini. Filter bubble mengacu pada kecenderungan algoritma media sosial yang hanya menampilkan informasi sesuai dengan preferensi dan pandangan kita, sementara echo chamber menggambarkan kondisi di mana kita hanya dikelilingi oleh informasi yang m",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/00b0b41bf4563ce5523f457d8f7387cc5d934dcf",
+        "diambil_pada": "2026-04-14T02:40:41.387Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 24,
+    "fields": {
+        "judul": "Pengaruh Self Development Terhadap Keterampilan Berkomunikasi Mahasiswa PPKn Universitas Lampung",
+        "penulis": "Elsa Nurhalisa, Berchah Pitoewas, D. Putri",
+        "abstrak": "Penelitian ini bertujuan untuk mengetahui bagaimana pengaruh Self Development terhadap Keterampilan Berkomunikasi Mahasiswa PPKn Universitas Lampung. Metode yang digunakan adalah deskriptif dengan pendekatan kuantitatif. Subjek dalam penelitian ini adalah mahasiswa PPKn Universitas Lampung dengan sampel 164 responden. Teknik pokok pengumpulan data menggunakan angket serta data pendukung observasi dan wawancara. Hasil penelitian menunujukkan bahwa terdapat pengaruh self development terhadap keter",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/bdc6418c2a8832152810ecb3914ce7aeae8e20db",
+        "diambil_pada": "2026-04-14T02:40:41.398Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 25,
+    "fields": {
+        "judul": "PENGARUH INFLUENCER DAN CONTENT MARKETING TERHADAP KEPUTUSAN PEMBELIAN DI TIKTOK PADA GENERASI Z DI BANDAR LAMPUNG (STUDI PADA MAHASISWA AKTIF ANGKATAN 2021 FAKULTAS EKONOMI DAN BISNIS UNIVERSITAS BANDAR LAMPUNG)",
+        "penulis": "Ardansyah, Marlinda",
+        "abstrak": "Dalam era digital, media sosial terutama TikTok, menjadi platform utama bagi Generasi Z untuk berinteraksi dan membuat keputusan pembelian. Bertujuan untuk mengevaluasi keputusan pembelian di TikTok pada Generasi Z di Bandar Lampung dipengaruhi oleh influencer dan content marketing. Metode kuantitatif yang diimplementasikan pada penelitian ini dengan populasi sejumlah 272 mahasiswa dan sampel melibatkan (73) Responden yang dipilih secara acak dan ditentukan secara spesifik menggunakan rumus Slov",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/aa93784f0296f1468b6b79d28ef5671ee7d4b82e",
+        "diambil_pada": "2026-04-14T02:40:41.405Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 26,
+    "fields": {
+        "judul": "Pengaruh Kualitas Produk dan Harga Terhadap Keputusan Pembelian Indomie Mahasiswa Universitas Bandar Lampung",
+        "penulis": "Arya Auralio Joyo, H. G. Soedarsa",
+        "abstrak": "Penelitian ini bertujuan untuk mengetahui pengaruh antara Kualitas Produk dan Harga Terhadap Keputusan Pembelian Indomie Mahasiswa Universitas Bandar Lampung. Penelitian ini menggunakan pendekatan kuantitatif dengan alat analisis SPSS. Uji kualitas data yang digunakan yaitu uji validitas dan uji reliabilitas, selanjutnya dilakukan uji asumsi klasik yaitu uji normalitas, uji multikolinearitas, dan uji heteroskedastisitas. Kemudian, pengujian hipotesis yang dilakukan yaitu uji t, selanjutnya dilak",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/92468420c9f37a35076276e8e388401f6565c065",
+        "diambil_pada": "2026-04-14T02:40:41.410Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 27,
+    "fields": {
+        "judul": "Perencanaan Tempat Pengolahan Sampah Berbasis 3R (Reduce, Reuse, Recycle) Di Universitas Malahayati Bandar Lampung",
+        "penulis": "Ananda Restu Abadi",
+        "abstrak": "Tempat pengolahan sampah berbasis 3R (TPS 3R) merupakan lokasi di mana dilakukan kegiatan pengumpulan, pemilahan, penggunaan kembali, dan daur ulang sampah yang dirancang untuk membantu mengolah sampah dalam skala kawasan. Penelitian ini bertujuan untuk mengetahui bagaimana desain perencanaan Tempat Pengolahan Sampah (TPS) berbasis 3R (Reuse, Reduce, Recycle) di Universitas Malahayati Bandar Lampung. Metode penelitian yang digunakan yaitu SNI 19-3694-1994 mengenai metode pengambilan dan pengukur",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/68ad363693ae0383370a2566ee912c7927dcb326",
+        "diambil_pada": "2026-04-14T02:40:41.414Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 28,
+    "fields": {
+        "judul": "Analisis Tingkat Pemahaman Mahasiswa Teknik Elektro Terhadap Materi Semikonduktor untuk Memenuhi Kebutuhan Industri: Studi Kasus di Universitas Lampung",
+        "penulis": "Sri Purwiyanti, Helm Fitriawan, M. Komarudin, Syaiful Alam",
+        "abstrak": "The semiconductor industry is a strategic sector that plays a crucial role in supporting digital transformation and national technological independence. To build a competitive semiconductor ecosystem, it is essential to develop human resources (HR) with a strong understanding of semiconductor concepts and applications. This study aims to analyze the level of understanding among electrical engineering students regarding semiconductor materials as a foundation for strengthening HR capacity in this",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/33a60e95c7c45f74a86c21a85925c77ee0b9c6fd",
+        "diambil_pada": "2026-04-14T02:40:41.418Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 29,
+    "fields": {
+        "judul": "Pengaruh Pembelajaran Kewirausahaan dan Motivasi Berwirausaha Terhadap Minat Berwirausaha Pada Mahasiswa Fakultas Ekonomi dan Bisnis Universitas Bandar Lampung",
+        "penulis": "Dhalvi Al Affan, Harpain",
+        "abstrak": "Indonesia is currently facing a demographic bonus with the majority of its population being of productive age, which provides a great opportunity to increase economic productivity through entrepreneurship. Bandar Lampung University supports this through various entrepreneurship programs, such as the Innovation and Ideavation Academy. The study aims to examine the impact. The study explores the impact of entrepreneurial education and motivational factors on students' entrepreneurial interest at t",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/15cc8d0ef564afc8ec4f0b83e0609f299dc95030",
+        "diambil_pada": "2026-04-14T02:40:41.424Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 30,
+    "fields": {
+        "judul": "IMPLEMENTASI WAZUH MENGGUNAKAN METODE PPDIOO DI SISTEM KEAMANAN JARINGAN PSDKU UNIVERSITAS LAMPUNG WAYKANAN SEBAGAI DETEKSI DAN RESPON SERANGAN SIBER",
+        "penulis": "Azzah Shafiyyah, Gigih Forda Nama, Rio Ariestia Pradipta",
+        "abstrak": "PSDKU Universitas Lampung Way Kanan membutuhkan sistem keamanan jaringan yang efektif untuk melindungi jaringan komputer server lab komputer dari serangan siber yaitu brute force dan Denial of Service (DoS)Untuk meningkatkan keamanan jaringan, diperlukan implementasi sistem keamanan jaringan dengan menggunakan platform wazuh sebagai server monitoring dan wazuh agent yang diinstal pada komputer server jaringan lab komputer PSDKU menggunakan Server Utama PSDKU. Metodepengembangan sistem keamanan y",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/7c4424ab641676fde5c4af4251f31c64ef9fbb68",
+        "diambil_pada": "2026-04-14T02:40:41.430Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 31,
+    "fields": {
+        "judul": "HUBUNGAN AKTIVITAS FISIK TERHADAP FLEKSIBILITAS LUMBAL PADA MAHASISWA FAKULTAS KEDOKTERAN UNIVERSITAS LAMPUNG",
+        "penulis": "Hafshah Hafshah, D. N. Fiana, Ratna Dewi Puspita Sari",
+        "abstrak": "Mahasiswa kedokteran cenderung memiliki tingkat aktivitas fisik yang ringan. Penurunan tingkat aktivitas fisik dapat memengaruhi fleksibilitas. Gaya hidup yang cenderung kurang aktif akan menimbulkan terjadinya kekakuan pada otot atau jaringan ikat pada sendinya. Hal ini disebabkan oleh adanya pemendekan atau atrofi otot karena otot tersebut kurang aktif digunakan. Penelitian ini bertujuan untuk mengetahui hubungan antara tingkat aktivitas fisik terhadap fleksibilitas lumbal. Penelitian cross se",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/445de0373988d93a8d4bce065cdd908b35e9b907",
+        "diambil_pada": "2026-04-14T02:40:41.434Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 32,
+    "fields": {
+        "judul": "EVALUASI KUALITAS SITUS WEB VIRTUAL CLASS UNIVERSITAS LAMPUNG MENGGUNAKAN METODE WEBQUAL 4.0: STUDI KASUS MAHASISWA FAKULTAS TEKNIK UNIVERSITAS LAMPUNG",
+        "penulis": "Beltra Saura Rahmadan",
+        "abstrak": "Virtual Class Universitas Lampung (VClass Unila) merupakan platform belajar dari yang dikembangkan Universitas Lampung. Selama pengimplentasian VClass Unila belum pernah dilakukan evaluasi untuk mengukur tingkat kepuasan mahasiswa terhadap website VClass Unila. Hal tersebut berpotensi menyebabkan sejumlah dampak negatif, seperti tidak terdeteksinya masalah yang mungkin dialami mahasiswa saat menggunakan website. Untuk menanggulangi masalah tersebut perlu dilakukan evaluasi terhadap kualitas webs",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/6dbcb87b2083b68eacc6e5db7e41d73b1477afab",
+        "diambil_pada": "2026-04-14T02:40:41.441Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 33,
+    "fields": {
+        "judul": "PENGARUH BEBAN KERJA DAN PENGEMBANGAN KARIR TERHADAP KINERJA SUMBER DAYA MANUSIA PADA FAKULTAS HUKUM UNIVERSITAS LAMPUNG",
+        "penulis": "M. Roni",
+        "abstrak": "Tujuan penelitian ini adalah untuk mengetahui seberapa besar pengaruh beban kerja dan pengembangan karir terhadap kinerja sumber daya manusia (SDM) pada Fakultas Hukum Universitas Lampung. Dalam penelitian ini menggunakan pendekatan deskriptif kuantitatif, dimana pengolahan datanya dilakukan secara statistik. Jumlah sampel yang diambil adalah sebanyak 65 responden dengan metode Sampling Jenuh, kelompok dari Non Probability Sampling, yaitu dilakukan secara sensus dimana populasi dijadikan sampel ",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/50cab63afbbf8f70f8d7542a217f671ae3789f97",
+        "diambil_pada": "2026-04-14T02:40:41.446Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 34,
+    "fields": {
+        "judul": "Pelatihan Penerapan Konsep Keuangan bagi Kepengurusan Koperasi Mahasiswa (KOPMA) Universitas Lampung",
+        "penulis": "Mohammad athian Manan, Euis Mufahamah, Ayu Nursari, Hiro Sejati",
+        "abstrak": "This community service program was conducted at the Student Cooperative of Lampung University (Kopma Unila) with the aim of enhancing the financial literacy of its board members. The program involved 60 Kopma Unila board members and included education on financial management, the culture of saving, and investment. The methods used consisted of material presentations, interactive discussions, and hands-on practice. The results of this activity showed a significant increase in the understanding an",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/1300e290620a2f87116cd2674f6fb85d34cad5ab",
+        "diambil_pada": "2026-04-14T02:40:41.450Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 35,
+    "fields": {
+        "judul": "Hubungan Aktifitas Fisik Dengan Tekanan Darah Pada Karyawan Di Universitas Malahayati Bandar Lampung",
+        "penulis": "Muhamad Afgan Triana, Ringgo Alfarisi, Selvia Anggraeni, Teddy Teddy",
+        "abstrak": "Tingkat prevalensi hipertensi di provinsi Lampung, yang berada pada angka 29,94%, menempatkannya di peringkat 16 di antara provinsi-provinsi lainnya. Hipertensi telah dikaitkan dengan berbagai faktor risiko, termasuk kurangnya aktivitas fisik. Aktivitas fisik dapat mengurangi risiko hipertensi melalui beberapa mekanisme, termasuk adanya resistensi dalam pembuluh darah, gangguan regulasi fungsi sistem saraf simpatik, dan adanya sistem renin-angiotensin.     Tujuan penelitian ini adalah untuk meng",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/8304e0924e8a645ca8afddc613864ae799f30aec",
+        "diambil_pada": "2026-04-14T02:40:41.454Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 36,
+    "fields": {
+        "judul": "Studi Perilaku Harian Rusa Timor (Cervus timorensis) Di Penangkaran Rusa Universitas Lampung",
+        "penulis": "Bainah Sari Dewi, S. Nurjanah, Dian Iswandaru, S. Harianto",
+        "abstrak": "University of Lampung is one of the institutions that support the conservation of timor deer (Cervus timorensis) through ex-situ conservation in the form of captivity. In an effort to develop timor deer in captivity, it is necessary to know the daily behavior data. The purpose of this study was to determine the daily behavior of timor deer in deer breeding at Lampung University. This research was conducted for 10 days in October-November 2023, starting at 06.00-18.00 WIB. The method used was the",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/beba111fa2f8e667129477fa13c25d26f141c378",
+        "diambil_pada": "2026-04-14T02:40:41.458Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 37,
+    "fields": {
+        "judul": "Peran Biro Kemahasiswaan Dan Alumni (Bimawa) Universitas Muhammadiyah Lampung Dalam Pengembangan Potensi Non Akademik Mahasiswa",
+        "penulis": "M. F. Ramadan, N. Islam, M. Putri",
+        "abstrak": "Penelitian ini bertujuan untuk mengeksplorasi peranan Biro Kemahasiswaan dan Alumni (Bimawa) Universitas Muhammadiyah Lampung dalam pengembangan potensi non akademik mahasiswa, khususnya bagi mahasiswa Prodi Ilmu Pemerintahan FISIP angkatan 2021. Metode yang digunakan dalam penelitian ini meliputi wawancara semi-terstruktur, observasi partisipan, dan analisis dokumen. Melalui wawancara dengan berbagai informan, peneliti mengumpulkan data mengenai program-program yang diselenggarakan oleh Bimawa ",
+        "tanggal_terbit": null,
+        "sumber": "semantic_scholar",
+        "url_asli": "https://www.semanticscholar.org/paper/95487d1fb381fb8dcfb98051c8b3bbd36fda5b64",
+        "diambil_pada": "2026-04-14T02:40:41.465Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 38,
+    "fields": {
+        "judul": "Praktik Manajemen CSR (tanggung jawab sosial perusahaan) \r\nPT. GGPC Lampung Tengah\r\n",
+        "penulis": " Wildan, Abdurrahman Wildan",
+        "abstrak": "Penelitian ini bertujuan untuk mengetahui bagaimana proses praktik penerapan program Corporate Social Responsibility PT. GGPC Lampung Tengah yang bergerak di bidang pengalengan makanan khususnya pengalengan nanas sebagai komoditi ekspor. Tipe penelitian yang digunakan adalah deskriptif dengan pendekatan kualitatif. lokasi penelitian ini dilakukan PT. GGPC yang bertempat di daerah lampung tengah. \r\n\r\nHasil penelitian ini menunjukkan bahwa PT. GGPC Lampung Tengah menerapkan program Corporate Social Responsibility menggunakan empat tahapan yaitu tahapan perencanaan, implementasi, pelaporan dan evaluasi dalam penarapan setiap program yang ada. Praktik penerapan program Corporate Social Responsibility PT.GGPC di Lampung Tengah yang melibatkan masyarakat, pemeritah serta pihak perusahaan sebagai regulataor atas terlaksananya program-program Corporate Social Responsibility adalah dalam upaya untuk meningkatkan ekonomi masyarakat sekita, pelesatarian alam dan kestabilan antara perusahaan dan masyarakat sekitar perusahaan. proses serta tindakan subjek yang telibat di dalamnya, karena penelitian ini meneliti proses praktik manajemen implementasi program Corporate Social Responsibility PT.GGPC di Lampung Tengah yang sebagian dari prosesnya sudah dijalankan. Sehingga harus merunut kebelakang melalui data-data yang dikumpulkan dilapangan dari tahap perencanaan, implementasi, pelaporan hingga evaluasi.\r\n\r\nKata kunci : Tanggung Jawab Sosial P¬¬erusahaan.\r\n",
+        "tanggal_terbit": "2011-01-02",
+        "sumber": "digilib_unila",
+        "url_asli": "http://digilib.unila.ac.id/4/1/ABSTRAK.pdf",
+        "diambil_pada": "2026-04-14T03:12:21.978Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 39,
+    "fields": {
+        "judul": " \r\nOPTIMASI ALIRAN DAYA MENGGUNAKAN UNIFIED POWER FLOW CONTROL (UPFC) PADA SISTEM TRANSMISI 150 KV WILAYAH \r\n \r\nLAMPUNG ",
+        "penulis": "., EZI HAILI ANANTA ",
+        "abstrak": "Jaringan transmisi merupakan bagian penting dalam sistem tenaga untuk \r\nmenyalurkan energi listrik dari pusat pembangkit ke beban, untuk itu sistem tenaga harus diusahakan secara maksimal agar dicapai aliran daya yang optimal, artinya dengan tercapainya syarat – syarat tegangan yang terpenuhi dan rugi – rugi daya yang minimal. \r\nPada penelitian ini akan dilakukan simulasi tentang optimasi aliran daya menggunakan Unified Power Flow Control ( UPFC ). UPFC dapat mengontrol aliran daya pada transmisi dengan  mengatur parameter yang mempengaruhi aliran daya sehingga dicapai aliran daya yang optimal. \r\nDari hasil penelitian diperoleh bahwa pemasangan UPFC untuk menghasilkan aliran daya optimal berada antara bus 3 (Bukit Kemuning) dengan bus 4 (Kotabumi) dengan injeksi tegangan r sebesar 0.1 p.u. sudut 300° (deg) diperoleh penurunan total loss saluran sebesar 49.33 % daya aktif  dan 49.20 % daya reaktif dan peningkatan tegangan pada bus 4 sebesar 2.66 %. \r\n Kata kunci : FACT, UPFC, Aliran Daya, Optimasi Aliran Daya ",
+        "tanggal_terbit": "2013-02-18",
+        "sumber": "digilib_unila",
+        "url_asli": "http://digilib.unila.ac.id/8/1/cover%20dalam.pdf",
+        "diambil_pada": "2026-04-14T03:12:22.095Z"
+    }
+},
+{
+    "model": "SearchEngine.dokumenakademik",
+    "pk": 40,
+    "fields": {
+        "judul": "KETAHANAN KULTIVAR CABAI MERAH (Capsicum annuum L.) TERHADAP JAMUR Colletotrichum capsici (Syd.) Butler & Bisby PENYEBAB PENYAKIT ANTRAKNOSA",
+        "penulis": "Miskun, Arie Regita",
+        "abstrak": 
