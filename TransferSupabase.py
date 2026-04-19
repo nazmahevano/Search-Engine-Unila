@@ -22,8 +22,8 @@ def mulai_transfer_turbo():
             title=item.title,
             author=item.author,
             abstract=item.abstract,
-            # fakulty=item.fakulty, # Pakai kalau ada di models.py
-            # major=item.major,       # Pakai kalau ada di models.py
+            fakulty=item.fakulty, # Pakai kalau ada di models.py
+            type=item.type,       # Pakai kalau ada di models.py
             date_release=item.date_release,
             url_asli=item.url_asli,
             source=item.source

@@ -26,7 +26,7 @@ def run_dump():
                 "author": obj.author,
                 "abstract": obj.abstract,
                 "fakulty": obj.fakulty,
-                "major": obj.major,
+                "type": obj.type,
                 "date_release": str(obj.date_release) if obj.date_release else None,
                 "url_asli": obj.url_asli,
                 "source": obj.source,

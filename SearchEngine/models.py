@@ -23,7 +23,7 @@ class DokumenAkademik(models.Model):
     url_bab_3 = models.URLField(max_length=500, null=True, blank=True)
     
     # --- Kolom Akademik (Terbaru) ---
-    major = models.CharField(max_length=100, null=True, blank=True) # Prodi
+    type = models.CharField(max_length=100, null=True, blank=True) # Jenis Dokumen (Skripsi, Tesis, Disertasi)
     faculty = models.CharField(max_length=100, null=True, blank=True) # Fakultas
 
     class Meta:

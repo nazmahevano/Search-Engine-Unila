@@ -9,4 +9,4 @@ class DokumenAkademikAdmin(admin.ModelAdmin):
     
     # Kalau kamu punya search_fields atau list_filter, ganti juga ya!
     search_fields = ('title', 'author') 
-    list_filter = ('source', 'faculty', 'major')
+    list_filter = ('source', 'faculty', 'type')
