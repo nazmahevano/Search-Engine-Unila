@@ -82,7 +82,8 @@ import dj_database_url
 DATABASES = {
     # Database Baru (Supabase) - Kita jadikan default agar data pindah ke sini
     'default': dj_database_url.config(
-        default='postgresql://postgres:g06bhpJZMEwiNyeZ@db.yvwjvupmywqamvzuiaaj.supabase.co:5432/postgres',
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
         ssl_require=True
     ),
     

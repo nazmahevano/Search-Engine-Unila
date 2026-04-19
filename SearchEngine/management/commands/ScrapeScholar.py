@@ -51,10 +51,10 @@ class Command(BaseCommand):
                         obj, created = DokumenAkademik.objects.get_or_create(
                             url_asli=url_scholar,
                             defaults={
-                                'judul': title,
-                                'penulis': name,
-                                'sumber': 'scholar',
-                                'abstrak': f"Verified Unila Publication by {name}"
+                                'title': title,
+                                'author': name,
+                                'source': 'scholar',
+                                'abstract': f"Verified Unila Publication by {name}"
                             }
                         )
 

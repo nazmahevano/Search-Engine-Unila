@@ -1,6 +1,10 @@
 from django.urls import path
-from .views import api_search
+from . import views
 
 urlpatterns = [
-    path('api/search/', api_search, name='api_search'),
+    # Arahkan halaman utama ke fungsi api_search yang kamu punya
+    path('', views.api_search, name='home'),
+    
+    # Jalur API tetap ada
+    path('api/search/', views.api_search, name='api_search'),
 ]

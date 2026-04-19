@@ -43,7 +43,7 @@ class Command(BaseCommand):
                     meta = record.find(['metadata', 'oai:metadata'])
                     if not meta: continue
 
-                    title = meta.find(['title', 'dc:title']).text if meta.find(['title', 'dc:title']) else "Tanpa Judul"
+                    title = meta.find(['title', 'dc:title']).text if meta.find(['title', 'dc:title']) else "Tanpa title"
                     identifiers = meta.find_all(['identifier', 'dc:identifier'])
                     link = next((ids.text for ids in identifiers if ids.text.startswith('http://digilib.unila.ac.id/')), "")
 
@@ -59,11 +59,11 @@ class Command(BaseCommand):
                         DokumenAkademik.objects.update_or_create(
                             url_asli=link,
                             defaults={
-                                'judul': title,
-                                'penulis': authors,
-                                'sumber': 'digilib_unila',
-                                'abstrak': abstract_text,
-                                'tanggal_terbit': date_issued,
+                                'title': title,
+                                'author': authors,
+                                'source': 'digilib_unila',
+                                'abstract': abstract_text,
+                                'date_release': date_issued,
                             }
                         )
 

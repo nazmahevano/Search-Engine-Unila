@@ -61,10 +61,10 @@ class Command(BaseCommand):
                     obj, created = DokumenAkademik.objects.get_or_create(
                         url_asli=paper_url,
                         defaults={
-                            'judul': title,
-                            'penulis': authors_str,
-                            'sumber': 'semantic_scholar',
-                            'abstrak': abstract[:1000] # Batasi agar tidak meledakkan database
+                            'title': title,
+                            'author': authors_str,
+                            'source': 'semantic_scholar',
+                            'abstract': abstract[:1000] # Batasi agar tidak meledakkan database
                         }
                     )
 

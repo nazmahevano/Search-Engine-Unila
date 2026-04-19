@@ -9,7 +9,7 @@ def api_search(request):
     
     if query_text:
         # 2. Logika Search PostgreSQL (Mencari di Judul dan Abstrak)
-        vector = SearchVector('judul', weight='A') + SearchVector('abstrak', weight='B')
+        vector = SearchVector('title', weight='A') + SearchVector('abstract', weight='B')
         query = SearchQuery(query_text)
         
         # 3. Eksekusi pencarian & urutkan berdasarkan yang paling relevan
@@ -21,9 +21,9 @@ def api_search(request):
         data = []
         for item in results:
             data.append({
-                'judul': item.judul,
-                'penulis': item.penulis,
-                'abstrak': item.abstrak[:200] + "...", # Potong biar gak kepanjangan
+                'title': item.title,
+                'author': item.author,
+                'abstract': item.abstract[:200] + "...", # Potong biar gak kepanjangan
                 'url': item.url_asli,
                 'skor': round(item.rank, 2)
             })

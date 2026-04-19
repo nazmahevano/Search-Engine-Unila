@@ -19,14 +19,14 @@ def mulai_transfer_turbo():
 
     for item in data_local:
         new_item = DokumenAkademik(
-            judul=item.judul,
-            penulis=item.penulis,
-            abstrak=item.abstrak,
-            # fakultas=item.fakultas, # Pakai kalau ada di models.py
-            # prodi=item.prodi,       # Pakai kalau ada di models.py
-            tanggal_terbit=item.tanggal_terbit,
+            title=item.title,
+            author=item.author,
+            abstract=item.abstract,
+            # fakulty=item.fakulty, # Pakai kalau ada di models.py
+            # major=item.major,       # Pakai kalau ada di models.py
+            date_release=item.date_release,
             url_asli=item.url_asli,
-            sumber=item.sumber
+            source=item.source
         )
         batch_list.append(new_item)
         

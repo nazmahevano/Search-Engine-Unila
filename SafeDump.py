@@ -22,14 +22,14 @@ def run_dump():
             "model": "SearchEngine.dokumenakademik",
             "pk": obj.pk,
             "fields": {
-                "judul": obj.judul,
-                "penulis": obj.penulis,
-                "abstrak": obj.abstrak,
-                "fakultas": obj.fakultas,
-                "prodi": obj.prodi,
-                "tanggal_terbit": str(obj.tanggal_terbit) if obj.tanggal_terbit else None,
+                "title": obj.title,
+                "author": obj.author,
+                "abstract": obj.abstract,
+                "fakulty": obj.fakulty,
+                "major": obj.major,
+                "date_release": str(obj.date_release) if obj.date_release else None,
                 "url_asli": obj.url_asli,
-                "sumber": obj.sumber,
+                "source": obj.source,
             }
         }
         all_data.append(data_item)
