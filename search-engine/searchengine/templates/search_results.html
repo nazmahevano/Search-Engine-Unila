@@ -1,0 +1,234 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Hasil Pencarian: {{ query }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #ffffff; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
+
+        /* Navigasi Atas */
+        .top-nav { display: flex; justify-content: space-between; align-items: flex-start; padding: 15px 40px; border-bottom: 1px solid #ebebeb; position: relative; }
+        .nav-btn { padding: 8px 16px; border: 1px solid #dfe1e5; border-radius: 20px; background: white; cursor: pointer; text-decoration: none; color: #333; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .nav-btn:hover { background: #f8f9fa; }
+
+        /* Pusat Database Switcher */
+        .db-center-box { position: relative; z-index: 20; }
+        .db-toggle-btn { background: white; border: 1px solid #dfe1e5; border-radius: 30px; padding: 10px 30px; font-size: 1rem; color: #202124; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s; font-family: inherit;}
+        .db-toggle-btn:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        .db-dropdown { display: none; position: absolute; top: 120%; left: 50%; transform: translateX(-50%); background: white; border: 1px solid #dfe1e5; border-radius: 20px; padding: 20px 30px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); width: max-content; }
+        .db-dropdown.show { display: block; }
+        
+        .db-icons { display: flex; gap: 10px; justify-content: center; }
+        .db-icons input[type="radio"] { display: none; }
+        .db-icons label { cursor: pointer; opacity: 0.5; transition: all 0.2s ease-in-out; display: flex; flex-direction: column; align-items: center; font-size: 0.85rem; color: #5f6368; padding: 10px 15px; border-radius: 12px; }
+        .db-icons label img { width: 35px; height: 35px; margin-bottom: 5px; object-fit: contain; transition: 0.2s; }
+        
+        .db-icons label:hover { opacity: 1; background-color: #f1f3f4; transform: translateY(-2px); }
+        .db-icons input[type="radio"]:checked + label { opacity: 1; transform: scale(1.05); font-weight: bold; color: #1a73e8; background-color: #e8f0fe; }
+        .db-icons input[type="radio"]:checked + label img { filter: drop-shadow(0px 3px 5px rgba(26, 115, 232, 0.4)); }
+
+        /* Dropdown Filter */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; right: 0; top: 40px; background-color: #ffffff; min-width: 280px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1); border: 1px solid #dfe1e5; padding: 20px; z-index: 100; border-radius: 8px; }
+        .dropdown-content.show { display: block; }
+        .filter-group { margin-bottom: 15px; }
+        .filter-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem;}
+        .filter-input { width: 100%; padding: 8px; border: 1px solid #dfe1e5; border-radius: 5px; box-sizing: border-box;}
+        
+        /* Area Pencarian */
+        .search-area { padding: 20px 40px; border-bottom: 1px solid #ebebeb; display: flex; justify-content: center; }
+        .search-input-box { width: 80%; max-width: 800px; display: flex; border: 1px solid #dfe1e5; border-radius: 30px; padding: 5px 20px; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+        .search-input-box input { flex: 1; border: none; outline: none; padding: 10px; font-size: 1.1rem; background: transparent;}
+        .search-input-box button { background: none; border: none; cursor: pointer; font-size: 1.2rem; color: #5f6368;}
+
+        /* Area Hasil */
+        .results-area { padding: 30px 10%; max-width: 1000px; margin: auto; }
+        .result-card { margin-bottom: 30px; }
+        .title { color: #1a0dab; font-size: 1.3rem; margin: 0 0 5px 0; }
+        .link-url { color: #006621; font-size: 0.9rem; margin-bottom: 2px; }
+        .meta { color: #545454; font-size: 0.9rem; margin-bottom: 5px; font-weight: bold; }
+        .abstract { color: #4d5156; font-size: 0.95rem; line-height: 1.5; }
+
+        /* === TEMA MODE GELAP (DARK MODE) === */
+        body.dark-mode { background-color: #202124; color: #e8eaed; }
+        body.dark-mode .top-nav { border-bottom: 1px solid #3c4043; background: #202124; }
+        body.dark-mode .nav-btn, body.dark-mode .db-toggle-btn { background: #303134; color: #e8eaed; border-color: #5f6368; }
+        body.dark-mode .db-dropdown, body.dark-mode .dropdown-content { background: #303134; border-color: #5f6368; }
+        body.dark-mode .filter-input { background: #202124; border-color: #5f6368; color: #e8eaed; }
+        body.dark-mode .search-area { border-bottom: 1px solid #3c4043; }
+        body.dark-mode .search-input-box { background: #303134; border-color: #5f6368; }
+        body.dark-mode .search-input-box input { color: #e8eaed; }
+        body.dark-mode .result-card { background: transparent; border: none; }
+        body.dark-mode .title, body.dark-mode .title a { color: #8ab4f8 !important; }
+        body.dark-mode .link-url { color: #81c995; }
+        body.dark-mode .meta, body.dark-mode .abstract, body.dark-mode .db-icons label { color: #bdc1c6; }
+        body.dark-mode .db-icons label:hover { background-color: #3c4043; }
+        body.dark-mode .db-icons input[type="radio"]:checked + label { background-color: #3c4043; color: #8ab4f8; }
+        body.dark-mode .db-title span { color: #8ab4f8 !important; }
+    </style>
+</head>
+<body>
+
+    <form action="/search/" method="GET" id="searchForm">
+        <div class="top-nav">
+            <div style="display: flex; gap: 10px;">
+                <a href="/" class="nav-btn">🏠 Kembali</a>
+                <button type="button" class="nav-btn" onclick="toggleDarkMode()" id="btn-dark-mode">🌙 Mode Gelap</button>
+            </div>
+
+            <div class="db-center-box">
+                <button type="button" class="db-toggle-btn" onclick="toggleDbMenu()">
+                    Cari dari database: 
+                    <span style="font-weight: bold; color: inherit;">
+                        {% if sumber == 'digilib' %}Digilib Skripsi
+                        {% elif sumber == 'scholar' %}Global Scholar
+                        {% else %}Semua Database{% endif %}
+                    </span>
+                </button>
+                
+                <div id="dbDropdownMenu" class="db-dropdown">
+                    <div class="db-icons">
+                        <input type="radio" name="sumber" id="db_digilib" value="digilib" {% if sumber == 'digilib' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
+                        <label for="db_digilib">
+                            <img src="{% static 'image/logo-unila.png' %}" alt="Digilib"> Digilib
+                        </label>
+
+                        <input type="radio" name="sumber" id="db_scholar" value="scholar" {% if sumber == 'scholar' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
+                        <label for="db_scholar">
+                            <div style="width:35px; height:35px; background:#e8f0fe; border-radius:50%; color:#4285f4; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;">🌐</div> Scholar
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button type="button" class="nav-btn" onclick="toggleFilterMenu()">▼ Filter berdasarkan</button>
+                <div id="filterMenu" class="dropdown-content">
+                    
+                    <div class="filter-group">
+                        <label>Rentang Tahun:</label>
+                        <div style="display:flex; gap:10px;">
+                            <input type="number" name="tahun_min" id="input_tahun_min" class="filter-input" placeholder="Dari" value="{{ tahun_min }}">
+                            <input type="number" name="tahun_max" id="input_tahun_max" class="filter-input" placeholder="Sampai" value="{{ tahun_max }}">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="button" onclick="resetFilter()" style="flex: 1; padding:10px; background:#f8f9fa; color:#333; border:1px solid #ccc; border-radius:5px; cursor:pointer; font-weight: bold;">Reset</button>
+                        <button type="submit" style="flex: 2; padding:10px; background:#4285f4; color:white; border:none; border-radius:5px; cursor:pointer; font-weight: bold;">Terapkan Filter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-area">
+            <div class="search-input-box">
+                <span style="padding-right:10px; color:#9aa0a6;">Cari</span>
+                <input type="text" name="q" value="{{ query }}">
+                <button type="submit">🔍</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="results-area">
+        {% for item in page_obj %}
+            <div class="result-card">
+                {% if item.id %}
+                    <h3 class="title"><a href="/detail/{{ item.id }}/" style="text-decoration: none;">{{ item.judul }}</a></h3>
+                    <div class="link-url">{% if item.url_asli %}{{ item.url_asli }}{% else %}digilib.universitas.ac.id/skripsi/{{ item.id }}{% endif %}</div>
+                    <div class="meta">{{ item.penulis }} - {{ item.tanggal_terbit }}</div>
+                    <div class="abstract">{{ item.abstrak|truncatewords:40 }}</div>
+                
+                {% else %}
+                    <h3 class="title"><a href="{{ item.link }}" style="text-decoration:none;" target="_blank">{{ item.judul }}</a></h3>
+                    <div class="link-url">{{ item.link }}</div>
+                    <div class="meta">{{ item.penulis }} - {{ item.tanggal_terbit }}</div>
+                    <div class="abstract">Dokumen dari database jurnal eksternal. Klik judul untuk membaca jurnal selengkapnya.</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        {% if total_hasil == 0 %}
+            <p style="color: #555; text-align:center;">Tidak ada hasil ditemukan. Coba sesuaikan kata kunci atau bersihkan filter Anda.</p>
+        {% endif %}
+
+        {% if page_obj.has_other_pages %}
+        <div class="pagination" style="margin-top: 40px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+            
+            {% if page_obj.has_previous %}
+                <a href="?q={{ query }}&sumber={{ sumber }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page=1" class="nav-btn">&laquo; Awal</a>
+                <a href="?q={{ query }}&sumber={{ sumber }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.previous_page_number }}" class="nav-btn">Sebelumnya</a>
+            {% endif %}
+
+            <span class="nav-btn" style="background: #e8f0fe; border: 1px solid #4285f4; color: #1a73e8; cursor: default;">
+                Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?q={{ query }}&sumber={{ sumber }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.next_page_number }}" class="nav-btn">Selanjutnya</a>
+                <a href="?q={{ query }}&sumber={{ sumber }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.paginator.num_pages }}" class="nav-btn">Akhir &raquo;</a>
+            {% endif %}
+            
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // ================= FITUR MODE GELAP =================
+        const body = document.body;
+        const btnDarkMode = document.getElementById('btn-dark-mode');
+
+        // Cek LocalStorage
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            btnDarkMode.innerHTML = '☀️ Mode Terang';
+        }
+
+        // Fungsi Toggle Mode Gelap
+        function toggleDarkMode() {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                btnDarkMode.innerHTML = '☀️ Mode Terang';
+            } else {
+                localStorage.setItem('theme', 'light');
+                btnDarkMode.innerHTML = '🌙 Mode Gelap';
+            }
+        }
+
+        // ================= FITUR RESET FILTER =================
+        function resetFilter() {
+            // Dropdown fakultas disembunyikan agar tidak error
+            document.getElementById('input_tahun_min').value = "";
+            document.getElementById('input_tahun_max').value = "";
+            document.getElementById('searchForm').submit();
+        }
+
+        // ================= FITUR UI INTERAKTIF =================
+        // Menu Database
+        function toggleDbMenu() {
+            document.getElementById("dbDropdownMenu").classList.toggle("show");
+            document.getElementById("filterMenu").classList.remove("show"); // Tutup filter jika buka database
+        }
+
+        // Menu Filter
+        function toggleFilterMenu() {
+            document.getElementById("filterMenu").classList.toggle("show");
+            document.getElementById("dbDropdownMenu").classList.remove("show"); // Tutup database jika buka filter
+        }
+
+        // Tutup dropdown saat klik sembarang di luar
+        window.onclick = function(event) {
+            if (!event.target.closest('.db-center-box')) {
+                const dbMenu = document.getElementById("dbDropdownMenu");
+                if(dbMenu) dbMenu.classList.remove('show');
+            }
+            if (!event.target.closest('.dropdown')) {
+                const filterMenu = document.getElementById("filterMenu");
+                if(filterMenu) filterMenu.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>

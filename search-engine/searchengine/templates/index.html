@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Engine Skripsi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Gradient background mirip dengan contoh */
+            background: white;
+            color: blue; /* Default teks putih */
+        }
+
+        .main-container {
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            color: blue; /* Judul putih */
+        }
+
+        form {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 25px; /* Pill shape */
+            border: 1px solid #ccc;
+            width: 100%;
+            max-width: 500px;
+            padding: 5px 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-icon {
+            font-size: 1.2rem;
+            color: #777;
+            padding-right: 15px;
+            border-right: 1px solid #ccc;
+            margin-right: 15px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px;
+            font-size: 1.1rem;
+            background: transparent;
+            color: #333; /* Teks input gelap */
+        }
+
+        .services-container {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem; /* Jarak antar tombol */
+        }
+
+        .service-tile {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            width: 110px; /* Ukuran ubin seragam */
+            height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none; /* Hilangkan garis bawah link */
+            color: #333; /* Teks layanan gelap */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .service-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .icon-container {
+            width: 75px;
+            height: 75px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        .custom-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Ikon Google Scholar - Biru dengan simbol globe */
+        .icon-container.google-scholar {
+            background: #4285f4; /* Biru Google */
+            border-radius: 50%;
+        }
+
+        .globe-symbol {
+            width: 25px;
+            height: 25px;
+            border: 2px solid white;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .globe-symbol::before, .globe-symbol::after {
+            content: '';
+            position: absolute;
+            border: 1px solid white;
+            border-radius: 50%;
+        }
+
+        .globe-symbol::before {
+            width: 25px;
+            height: 12px;
+            top: 5px;
+            left: -1px;
+        }
+
+        .globe-symbol::after {
+            width: 12px;
+            height: 25px;
+            top: -1px;
+            left: 5px;
+        }
+
+        .service-tile p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.2;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>Mulai Pencarian</h1>
+        
+        <form action="/search/" method="GET">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" name="q" class="search-input" placeholder="Masukkan kata kunci pencarian..." required>
+            </div>
+        </form>
+
+        <div class="services-container">
+            <a href="/search/?sumber=digilib" style="text-decoration: none; color: inherit;">
+                <div class="service-tile"> <img src="{% static 'image/logo-unila.png' %}" alt="Digilib" style="width: 50px;">
+                    <p>Digilib</p>
+                </div>
+            </a>
+
+            <a href="javascript:void(0)" onclick="cariDiScholar(event)" class="service-tile">
+                <div class="icon-container google-scholar">
+                    <div class="globe-symbol"></div>
+                </div>
+                <p>Google<br>Scholar</p>
+            </a>
+        </div>
+    </div>
+</body>
+
+<script>
+        function cariDiScholar(event) {
+            event.preventDefault(); // Mencegah link berpindah halaman biasa
+            
+            // Mengambil teks yang sedang diketik di kotak pencarian
+            var kataKunci = document.querySelector('.search-input').value;
+            
+            if (kataKunci.trim() === "") {
+                window.open("https://scholar.google.com/", '_blank');
+            } else {
+                // Membuat URL Google Scholar dan membukanya di tab baru
+                var urlScholar = "https://scholar.google.com/scholar?q=" + encodeURIComponent(kataKunci);
+                window.open(urlScholar, '_blank');
+            }
+        }
+    </script>
+
+</html>
