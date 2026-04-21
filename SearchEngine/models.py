@@ -5,6 +5,7 @@ class DokumenAkademik(models.Model):
     id = models.BigIntegerField(primary_key=True) 
     
     # --- Hasil Perubahan ke Bahasa Inggris ---
+    identifier = models.CharField(max_length=255, null=True, blank=True, unique=True)
     title = models.TextField() # Dulu: judul
     author = models.CharField(max_length=255) # Dulu: penulis
     abstract = models.TextField(null=True, blank=True) # Dulu: abstrak
