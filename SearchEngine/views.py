@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from .models import DokumenAkademik
@@ -9,6 +11,9 @@ from .serializers import DokumenSerializer
 class DokumenViewSet(viewsets.ModelViewSet):
     queryset = DokumenAkademik.objects.all()
     serializer_class = DokumenSerializer
+
+def index(request):
+    return render(request, 'index.html')
 
 # --- 2. VIEW UTAMA PENCARIAN (Untuk Halaman Web) ---
 def search_view(request):
@@ -41,9 +46,9 @@ def search_view(request):
         
         # Filter tambahan jika Rifdah mengirimkan filter tahun
         if tahun_min:
-            queryset = queryset.filter(date_release__year__gte=tahun_min)
+            queryset = queryset.filter(date_release__gte=tahun_min)
         if tahun_max:
-            queryset = queryset.filter(date_release__year__lte=tahun_max)
+            queryset = queryset.filter(date_release__lte=f"{tahun_max}-12-31")
 
         total_found = queryset.count()
 

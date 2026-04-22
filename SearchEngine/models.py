@@ -26,6 +26,12 @@ class DokumenAkademik(models.Model):
     # --- Kolom Akademik (Terbaru) ---
     type = models.CharField(max_length=100, null=True, blank=True) # Jenis Dokumen (Skripsi, Tesis, Disertasi)
     faculty = models.CharField(max_length=100, null=True, blank=True) # Fakultas
+    
+    @property
+    def get_year(self):
+        if self.date_release and len(self.date_release) >= 4:
+            return self.date_release[:4]
+        return "-"
 
     class Meta:
         managed = False  # WAJIB! Agar Django tidak mengubah tabel yang sudah ada
