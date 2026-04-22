@@ -135,15 +135,15 @@
         {% for item in page_obj %}
             <div class="result-card">
                 {% if item.id %}
-                    <h3 class="title"><a href="/detail/{{ item.id }}/" style="text-decoration: none;">{{ item.judul }}</a></h3>
-                    <div class="link-url">{% if item.url_asli %}{{ item.url_asli }}{% else %}digilib.universitas.ac.id/skripsi/{{ item.id }}{% endif %}</div>
-                    <div class="meta">{{ item.penulis }} - {{ item.tanggal_terbit }}</div>
-                    <div class="abstract">{{ item.abstrak|truncatewords:40 }}</div>
+                    <h3 class="title"><a href="/detail/{{ item.id }}/" style="text-decoration: none;">{{ item.title }}</a></h3>
+                    <div class="link-url">{% if item.url_digilib %}{{ item.url_digilib }}{% else %}digilib.universitas.ac.id/skripsi/{{ item.id }}{% endif %}</div>
+                    <div class="meta">{{ item.author }} - {{ item.date_release|date:"Y" }}</div>
+                    <div class="abstract">{{ item.abstract|truncatewords:40 }}</div>
                 
                 {% else %}
-                    <h3 class="title"><a href="{{ item.link }}" style="text-decoration:none;" target="_blank">{{ item.judul }}</a></h3>
+                    <h3 class="title"><a href="{{ item.link }}" style="text-decoration:none;" target="_blank">{{ item.title }}</a></h3>
                     <div class="link-url">{{ item.link }}</div>
-                    <div class="meta">{{ item.penulis }} - {{ item.tanggal_terbit }}</div>
+                    <div class="meta">{{ item.author }} - {{ item.date_release|date:"Y" }}</div>
                     <div class="abstract">Dokumen dari database jurnal eksternal. Klik judul untuk membaca jurnal selengkapnya.</div>
                 {% endif %}
             </div>

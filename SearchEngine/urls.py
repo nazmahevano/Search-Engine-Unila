@@ -6,9 +6,15 @@ router = DefaultRouter()
 router.register(r'dokumen', views.DokumenViewSet)
 
 urlpatterns = [
-    # Arahkan halaman utama ke fungsi api_search yang kamu punya
-    path('', include(router.urls)),
+    # 1. HALAMAN UTAMA: Langsung munculin index.html (Desain Rifdah)
+    path('', views.search_view, name='index'), 
     
-    # Jalur API tetap ada
-    path('search/', views.api_search, name='api_search'),
+    # 2. HALAMAN HASIL: Jalur saat tombol cari diklik
+    path('search/', views.search_view, name='search'),
+    
+    # 3. HALAMAN DETAIL: Untuk melihat abstrak lengkap
+    path('detail/<int:id>/', views.detail_view, name='detail'),
+    
+    # 4. JALUR API: Kita pindah ke /api/ biar gak tabrakan sama halaman utama
+    path('api/', include(router.urls)),
 ]

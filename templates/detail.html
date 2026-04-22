@@ -40,27 +40,27 @@
 
     <div class="container">
         <div class="tipe-dokumen">Dokumen Digilib Skripsi</div>
-        <h1 class="judul">{{ skripsi.judul }}</h1>
+        <h1 class="judul">{{ skripsi.title }}</h1>
         
         <div class="info-box">
-            <div class="info-item"><strong>Penulis:</strong> {{ skripsi.penulis }}</div>
-            <div class="info-item"><strong>Tahun:</strong> {{ skripsi.tanggal_terbit }}</div>
-            {% if skripsi.fakultas %}
-                <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.fakultas }}</div>
+            <div class="info-item"><strong>Penulis:</strong> {{ skripsi.author }}</div>
+            <div class="info-item"><strong>Tahun:</strong> {{ skripsi.date_release|date:"Y" }}</div>
+            {% if skripsi.faculty %}
+                <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.fakulty }}</div>
             {% endif %}
         </div>
 
         <div class="abstrak-title">Abstrak / Intisari</div>
         <div class="abstrak-teks">
-            {% if skripsi.abstrak %}
-                {{ skripsi.abstrak }}
+            {% if skripsi.abstract %}
+                {{ skripsi.abstract }}
             {% else %}
                 <i>Teks abstrak tidak tersedia untuk dokumen ini pada sumber data.</i>
             {% endif %}
         </div>
 
-        {% if skripsi.url_asli %}
-        <a href="{{ skripsi.url_asli }}" target="_blank" style="display: block; width: 100%; padding: 15px; text-align: center; background-color: #4285f4; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+        {% if skripsi.url_digilib %}
+        <a href="{{ skripsi.url_digilib }}" target="_blank" style="display: block; width: 100%; padding: 15px; text-align: center; background-color: #4285f4; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
             Buka Dokumen Asli
         </a>
         {% else %}
