@@ -17,4 +17,7 @@ urlpatterns = [
     
     # 4. JALUR API: Kita pindah ke /api/ biar gak tabrakan sama halaman utama
     path('api/', include(router.urls)),
+    
+    # 5. JALUR API: Semantic Scholar (Global Search) - Bisa dipanggil dari JS atau mobile app
+    path('api/global-search/', views.search_global_api, name='api_global_search'),
 ]
