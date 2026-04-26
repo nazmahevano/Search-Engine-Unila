@@ -44,9 +44,9 @@
         
         <div class="info-box">
             <div class="info-item"><strong>Penulis:</strong> {{ skripsi.author }}</div>
-            <div class="info-item"><strong>Tahun:</strong> {{ skripsi.date_release|date:"Y" }}</div>
+            <div class="info-item"><strong>Tahun:</strong> {{ skripsi.date_release|slice:":4"|default:skripsi.date_release }}</div>
             {% if skripsi.faculty %}
-                <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.fakulty }}</div>
+                <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.faculty }}</div>
             {% endif %}
         </div>
 

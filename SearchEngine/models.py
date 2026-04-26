@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
 
 class DokumenAkademik(models.Model):
     # Primary Key (Wajib ada agar Django bisa panggil data spesifik)
@@ -26,10 +28,24 @@ class DokumenAkademik(models.Model):
     # --- Kolom Akademik (Terbaru) ---
     type = models.CharField(max_length=100, null=True, blank=True) # Jenis Dokumen (Skripsi, Tesis, Disertasi)
     faculty = models.CharField(max_length=100, null=True, blank=True) # Fakultas
+    
+    search_vector = SearchVectorField(null=True, blank=True)
+    
+    @property
+    def get_year(self):
+        if self.date_release and len(self.date_release) >= 4:
+            return self.date_release[:4]
+        return "-"
 
     class Meta:
         managed = False  # WAJIB! Agar Django tidak mengubah tabel yang sudah ada
         db_table = 'SearchEngine_dokumenakademik' # Harus persis nama tabel di Supabase
+        
+    class Meta:
+        indexes = [
+            # Ini jalan tol paling sakti buat FTS
+            GinIndex(fields=['search_vector']),
+        ]
 
     def __str__(self):
         return self.title # Sekarang kita return title

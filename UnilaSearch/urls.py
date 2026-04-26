@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from SearchEngine import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.index, name='index'),
+    path('search/', views.search_view, name='search'),
+    path('detail/<int:id>/', views.detail_view, name='detail'),
     path('', include('SearchEngine.urls')),
 ]
