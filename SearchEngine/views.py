@@ -5,7 +5,14 @@ from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.http import JsonResponse
 from .models import DokumenAkademik
 from .services import SemanticScholarService
+from rest_framework import viewsets
+from .serializers import DokumenSerializer
 
+
+class DokumenViewSet(viewsets.ModelViewSet):
+    queryset = DokumenAkademik.objects.all()
+    serializer_class = DokumenSerializer
+    
 # --- 1. HALAMAN UTAMA ---
 def index(request):
     return render(request, 'index.html')
