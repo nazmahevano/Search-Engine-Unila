@@ -157,3 +157,5 @@ CACHES = {
         'LOCATION': 'unique-snowflake',
     }
 }
+# === KONFIGURASI API EKSTERNAL ===
+SEMANTIC_SCHOLAR_API_KEY = os.environ.get("SEMANTIC_SCHOLAR_API_KEY")

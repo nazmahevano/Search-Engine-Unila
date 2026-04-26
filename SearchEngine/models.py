@@ -27,7 +27,7 @@ class DokumenAkademik(models.Model):
     
     # --- Kolom Akademik (Terbaru) ---
     type = models.CharField(max_length=100, null=True, blank=True) # Jenis Dokumen (Skripsi, Tesis, Disertasi)
-    faculty = models.CharField(max_length=100, null=True, blank=True) # Fakultas
+    faculty = models.CharField(max_length=255, null=True, blank=True) # Fakultas
     
     search_vector = SearchVectorField(null=True, blank=True)
     

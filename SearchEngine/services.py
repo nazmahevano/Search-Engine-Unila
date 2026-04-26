@@ -1,14 +1,7 @@
-import os
 import requests
 import time
-from pathlib import Path
-from dotenv import load_dotenv
+from django.conf import settings
 from django.core.cache import cache # Penjaga gudang memori
-
-# Load .env biar API Key kebaca
-base_dir = Path(__file__).resolve().parent.parent
-env_path = base_dir / '.env'
-load_dotenv(dotenv_path=env_path)
 
 class SemanticScholarService:
     @staticmethod
@@ -17,7 +10,6 @@ class SemanticScholarService:
             return []
 
         # 1. CEK GUDANG (Cache)
-        # Bikin kunci unik berdasarkan kata kunci pencarian
         cache_key = f"semantic_{query_text.replace(' ', '_').lower()}"
         cached_data = cache.get(cache_key)
         
@@ -26,11 +18,12 @@ class SemanticScholarService:
             return cached_data
 
         # 2. JIKA GAK ADA DI GUDANG, BARU TEMBAK API
-        api_key = os.getenv("SEMANTIC_API_KEY")
+        api_key = getattr(settings, 'SEMANTIC_SCHOLAR_API_KEY', None)
         url = "https://api.semanticscholar.org/graph/v1/paper/search"
         headers = {'x-api-key': api_key} if api_key else {}
         
-        # Sesuai dokumentasi: Mengunci hasil agar hanya dari Universitas Lampung
+        # === DIKEMBALIKAN SEPERTI SEMULA ===
+        # Mengunci hasil agar hanya dari Universitas Lampung
         final_query = f'{query_text} "Universitas Lampung"'
 
         params = {
@@ -40,9 +33,11 @@ class SemanticScholarService:
         }
 
         try:
-            # Jeda 1.5 detik (Aturan resmi: max 1 request/detik)
-            time.sleep(1.5) 
-            print(f"📡 API CALL: Mencari '{query_text}' ke Semantic Scholar...")
+            # Jika tidak pakai API Key, baru disuruh antre lambat
+            if not api_key:
+                time.sleep(1.5) 
+                
+            print(f"📡 API CALL: Mencari '{query_text}' (Khusus Unila) ke Semantic Scholar...")
             
             response = requests.get(url, params=params, headers=headers, timeout=10)
             
@@ -56,12 +51,9 @@ class SemanticScholarService:
             return []
             
         except Exception as e:
-            print(f"❌ Error Koneksi: {e}")
+            print(f"❌ Error Koneksi API: {e}")
             return []
 
 # --- BAGIAN TESTING MANDIRI ---
 if __name__ == "__main__":
-    # Karena kita pake Django Cache, bagian ini mungkin error kalau 
-    # dijalankan via 'python services.py' tanpa env Django. 
-    # Jadi tesnya langsung via 'runserver' aja ya Naz!
     pass

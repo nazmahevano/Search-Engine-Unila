@@ -30,6 +30,7 @@ def search_view(request):
     sumber = request.GET.get('sumber', 'semua')
     tahun_min = request.GET.get('tahun_min', '')
     tahun_max = request.GET.get('tahun_max', '')
+    fakultas = request.GET.get('fakultas', '') # TAMBAHAN: Ambil data fakultas dari URL
 
     results_lokal = None
     total_found = 0
@@ -45,6 +46,10 @@ def search_view(request):
                 base_queryset = base_queryset.filter(date_release__gte=tahun_min)
             if tahun_max:
                 base_queryset = base_queryset.filter(date_release__lte=f"{tahun_max}-12-31")
+            
+            # TAMBAHAN: Lakukan filter ke kolom 'faculty' di database
+            if fakultas: 
+                base_queryset = base_queryset.filter(faculty__icontains=fakultas)
 
             matched_ids = base_queryset.order_by('-date_release').values_list('id', flat=True)[:1000]
             
@@ -71,9 +76,13 @@ def search_view(request):
         'sumber': sumber,
         'tahun_min': tahun_min,
         'tahun_max': tahun_max,
+        'fakultas': fakultas, # TAMBAHAN: Jangan lupa kirim ke template agar pilihan tidak hilang
         # 'global_results' sengaja gak diisi di sini biar gak nungguin API
     }
-    return render(request, 'search_results.html', context)
+    if sumber == 'scholar':
+        return render(request, 'semantic_results.html', context)
+    else:
+        return render(request, 'search_results.html', context)
 
 # --- 3. JALUR KHUSUS DATA GLOBAL (JSON UNTUK RIFDAH) ---
 def search_global_api(request):
