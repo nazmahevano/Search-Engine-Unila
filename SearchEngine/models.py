@@ -40,8 +40,6 @@ class DokumenAkademik(models.Model):
     class Meta:
         managed = False  # WAJIB! Agar Django tidak mengubah tabel yang sudah ada
         db_table = 'SearchEngine_dokumenakademik' # Harus persis nama tabel di Supabase
-        
-    class Meta:
         indexes = [
             # Ini jalan tol paling sakti buat FTS
             GinIndex(fields=['search_vector']),

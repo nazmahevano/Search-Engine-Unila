@@ -1,5 +1,7 @@
+from django.db import models
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Q
+from django.db.models.functions import Lower
+from django.db.models import F, Q
 from django.core.paginator import Paginator
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.http import JsonResponse
@@ -8,6 +10,8 @@ from .services import SemanticScholarService
 from rest_framework import viewsets
 from .serializers import DokumenSerializer
 
+from SearchEngine import models
+from django.contrib.postgres.search import TrigramSimilarity
 
 class DokumenViewSet(viewsets.ModelViewSet):
     queryset = DokumenAkademik.objects.all()
@@ -39,7 +43,13 @@ def search_view(request):
         # --- A. PROSES DIGILIB UNILA (LOKAL) ---
         # Kita cuma proses lokal di sini biar loading halaman secepat kilat!
         if sumber in ['semua', 'digilib']:
-            query = SearchQuery(query_text, config='indonesian')
+            # --- TAHAP 1: CARI ID (AKURAT & TYPO) ---
+            # 1. Ambil ID yang kena FTS (Akurat)
+            query = SearchQuery(query_text, config='indonesian', search_type='websearch')
+            fts_ids = list(DokumenAkademik.objects.filter(search_vector=query)
+                           .annotate(rank=SearchRank('search_vector', query))
+                           .order_by('-rank')
+                           .values_list('id', flat=True)[:500])
             
             base_queryset = DokumenAkademik.objects.filter(search_vector=query)
             if tahun_min:
@@ -50,21 +60,33 @@ def search_view(request):
             # TAMBAHAN: Lakukan filter ke kolom 'faculty' di database
             if fakultas: 
                 base_queryset = base_queryset.filter(faculty__icontains=fakultas)
+            # 2. Ambil ID yang kena Trigram (Fuzzy/Typo) - Kita pake saringan 0.1 biar anlaisa ketemu
+            fuzzy_ids = list(DokumenAkademik.objects.annotate(
+                sim=TrigramSimilarity(Lower('title'), query_text.lower())
+            ).filter(sim__gt=0.1)
+            .order_by('-sim') # <-- INI KUNCINYA: Biar Analisa ngalahin yang lain
+            .values_list('id', flat=True)[:500])
 
-            matched_ids = base_queryset.order_by('-date_release').values_list('id', flat=True)[:1000]
-            
-            queryset = DokumenAkademik.objects.filter(
-                id__in=matched_ids
-            ).annotate(
-                rank=SearchRank(
+            # Gabungkan semua ID, buang yang duplikat
+            all_ids = list(set(fts_ids + fuzzy_ids))
+            total_found = len(all_ids)
+
+            # 3. Proses Ranking dan Scoring
+            queryset = DokumenAkademik.objects.filter(id__in=all_ids).annotate(
+                # Skor FTS buat yang ngetiknya bener
+                fts_rank=SearchRank(
                     'search_vector', 
                     query, 
                     weights=[0.05, 0.1, 0.1, 1.0],
-                    normalization=2 
-                )
-            ).order_by('-rank', '-date_release')
-            
-            total_found = len(matched_ids)
+                    normalization=2
+                ),
+                # Skor Similarity buat yang typo
+                fuzzy_score=TrigramSimilarity('title', query_text)
+            ).annotate(
+                # Gabungin skornya
+                total_rank=(F('fts_rank') + F('fuzzy_score'))
+            ).order_by('-total_rank', '-date_release')
+
             paginator = Paginator(queryset, 10)
             results_lokal = paginator.get_page(page_number)
 
@@ -91,12 +113,17 @@ def search_global_api(request):
     Rifdah bakal manggil ini pake JavaScript (AJAX).
     """
     query_text = request.GET.get('q', '').strip()
+    t_min = request.GET.get('tahun_min', '')
+    t_max = request.GET.get('tahun_max', '')
     
     if not query_text:
         return JsonResponse({'results': []})
         
     # Panggil service (sudah ada Cache & Backoff di services.py lo)
-    results = SemanticScholarService.search_papers(query_text)
+    results = SemanticScholarService.search_papers(
+        query=query_text,
+        year=f"{t_min}-{t_max}" if t_min and t_max else None
+    )
     
     # Balikin data ke Rifdah
     return JsonResponse({'results': results})
