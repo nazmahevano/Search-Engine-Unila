@@ -2,51 +2,35 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>{{ skripsi.judul }} - Detail Skripsi</title>
+    <title>{{ skripsi.title }} - Detail Dokumen</title>
     <style>
         body { font-family: Arial, sans-serif; background: #ffffff; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
-        
-        /* Navigasi Atas */
         .top-nav { padding: 15px 40px; border-bottom: 1px solid #ebebeb; display: flex; gap: 10px; }
         .nav-btn { padding: 8px 16px; border: 1px solid #dfe1e5; border-radius: 20px; background: white; cursor: pointer; text-decoration: none; color: #333; font-weight: bold; font-size: 0.9rem; }
-        
-        /* --- Container Utama (Grid Ditukar Ww: 1fr 2fr) --- */
         .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 2fr; gap: 40px; }
-        
-        /* --- KOLOM KIRI: RINCIAN & TOMBOL (Sticky) --- */
         .kolom-rincian { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 20px; align-self: flex-start; }
-        
         .tipe-dokumen { color: #5f6368; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         .judul { color: #1a0dab; font-size: 1.5rem; margin: 0; line-height: 1.3; font-weight: normal; }
-        
-        /* Box Informasi */
         .info-box { background: #f8f9fa; border: 1px solid #dfe1e5; padding: 15px; border-radius: 8px; }
         .info-item { margin-bottom: 8px; font-size: 0.95rem; color: #333; }
         .info-item:last-child { margin-bottom: 0; }
-        
-        /* --- AREA TOMBOL --- */
         .area-tombol { display: flex; flex-direction: column; gap: 10px; }
-        
         .btn-general { display: block; width: 100%; text-align: center; padding: 12px 15px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 1rem; transition: 0.2s; box-sizing: border-box; border: none; }
         .btn-general:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-        
         .btn-file { background: #34a853; color: white; }
         .btn-file:hover { background: #2d9249; }
-        
         .btn-bab { background: #fbbc05; color: #202124; }
         .btn-bab:hover { background: #e6ac00; }
-        
         .btn-buka { background: #4285f4; color: white; box-shadow: 0 2px 4px rgba(66, 133, 244, 0.3); }
         .btn-buka:hover { background: #3367d6; }
-
+        .btn-lppm { background: #d93025; color: white; box-shadow: 0 2px 4px rgba(217, 48, 37, 0.3); }
+        .btn-lppm:hover { background: #b3271d; }
         .btn-general:disabled, .btn-general.disabled { background: #e0e0e0; color: #757575; cursor: not-allowed; box-shadow: none; transform: none; }
-
-        /* --- KOLOM KANAN: ABSTRAK --- */
         .kolom-abstrak { display: flex; flex-direction: column; }
         .abstrak-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #4285f4; display: inline-block; padding-bottom: 5px; align-self: flex-start; }
         .abstrak-teks { font-size: 1.05rem; line-height: 1.7; color: #4d5156; text-align: justify; margin-bottom: 40px; }
-
-        /* --- Dark Mode Support --- */
+        
+        /* Dark Mode */
         body.dark-mode { background-color: #202124; color: #e8eaed; }
         body.dark-mode .top-nav { border-bottom: 1px solid #3c4043; background: #202124; }
         body.dark-mode .nav-btn { background: #303134; color: #e8eaed; border-color: #5f6368; }
@@ -57,13 +41,7 @@
         body.dark-mode .tipe-dokumen { color: #9aa0a6; }
         body.dark-mode .btn-general:disabled { background: #3c4043; color: #80868b; }
         body.dark-mode .btn-bab { color: #202124; }
-
-        /* Responsif untuk HP */
-        @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; gap: 20px; }
-            /* Kolom rincian otomatis muncul duluan karena urutan di HTML */
-            .judul { font-size: 1.3rem; }
-        }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; gap: 20px; } .judul { font-size: 1.3rem; } }
     </style>
 </head>
 <body>
@@ -73,40 +51,78 @@
     </div>
 
     <div class="container">
-        
+        <!-- KOLOM KIRI: RINCIAN -->
         <div class="kolom-rincian">
-            <div class="tipe-dokumen">Dokumen Digilib Skripsi</div>
+            {% if skripsi.source == 'LPPM' %}
+                <div class="tipe-dokumen">Dokumen LPPM Unila</div>
+            {% else %}
+                <div class="tipe-dokumen">Dokumen Digilib Skripsi</div>
+            {% endif %}
+
             <h1 class="judul">{{ skripsi.title }}</h1>
             
             <div class="info-box">
                 <div class="info-item"><strong>Penulis:</strong> {{ skripsi.author }}</div>
-                <div class="info-item"><strong>Tahun:</strong> {{ skripsi.year}}</div>
-                {% if skripsi.division %}
-                    <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.division }}</div>
+                <div class="info-item"><strong>Tahun:</strong> 
+                    {% if skripsi.year %}{{ skripsi.year }}{% elif skripsi.date_release %}{{ skripsi.date_release|date:"Y" }}{% else %}Tidak diketahui{% endif %}
+                </div>
+                <!-- Fakultas hanya muncul jika datanya ada -->
+                {% if skripsi.faculty %}
+                    <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.faculty }}</div>
                 {% endif %}
             </div>
 
             <div class="area-tombol">
+                <!-- 1. Tombol Abstract: Cek file_url (LPPM) atau url_abstract (Digilib) -->
                 {% if skripsi.file_url %}
                     <a href="{{ skripsi.file_url }}" target="_blank" class="btn-general btn-file">📄 Lihat Abstract (PDF)</a>
+                {% elif skripsi.url_abstract %}
+                    <a href="{{ skripsi.url_abstract }}" target="_blank" class="btn-general btn-file">📄 Lihat Abstract (PDF)</a>
                 {% else %}
                     <button disabled class="btn-general disabled">❌ Abstract (PDF) Tidak Tersedia</button>
                 {% endif %}
 
+                <!-- TAMPILKAN TOMBOL BAB 1-3 HANYA JIKA BUKAN LPPM -->
+                {% if skripsi.source != 'LPPM' %}
+                    {% if skripsi.url_bab_1 %}
+                        <a href="{{ skripsi.url_bab_1 }}" target="_blank" class="btn-general btn-bab">📁 BAB I</a>
+                    {% else %}
+                        <button disabled class="btn-general disabled">❌ BAB I Tidak Tersedia</button>
+                    {% endif %}
+
+                    {% if skripsi.url_bab_2 %}
+                        <a href="{{ skripsi.url_bab_2 }}" target="_blank" class="btn-general btn-bab">📁 BAB II</a>
+                    {% else %}
+                        <button disabled class="btn-general disabled">❌ BAB II Tidak Tersedia</button>
+                    {% endif %}
+
+                    {% if skripsi.url_bab_3 %}
+                        <a href="{{ skripsi.url_bab_3 }}" target="_blank" class="btn-general btn-bab">📁 BAB III</a>
+                    {% else %}
+                        <button disabled class="btn-general disabled">❌ BAB III Tidak Tersedia</button>
+                    {% endif %}
+                {% endif %}
+
                 <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;"></div>
 
+                <!-- 2. Tombol Dokumen Asli: Cek source_url (LPPM) atau url_digilib (Digilib) -->
                 {% if skripsi.source_url %}
-                    <a href="{{ skripsi.source_url }}" target="_blank" class="btn-general btn-buka">
-                        🔗 Buka Dokumen Asli di Digilib
+                    <a href="{{ skripsi.source_url }}" target="_blank" class="btn-general {% if skripsi.source == 'LPPM' %}btn-lppm{% else %}btn-buka{% endif %}">
+                        {% if skripsi.source == 'LPPM' %}🔗 Buka Dokumen di LPPM{% else %}🔗 Buka Dokumen Asli{% endif %}
+                    </a>
+                {% elif skripsi.url_digilib %}
+                    <a href="{{ skripsi.url_digilib }}" target="_blank" class="btn-general {% if skripsi.source == 'LPPM' %}btn-lppm{% else %}btn-buka{% endif %}">
+                        {% if skripsi.source == 'LPPM' %}🔗 Buka Dokumen di LPPM{% else %}🔗 Buka Dokumen di Digilib{% endif %}
                     </a>
                 {% else %}
                     <button disabled class="btn-general disabled">
-                        ❌ Link Digilib tidak tersedia
+                        {% if skripsi.source == 'LPPM' %}❌ Link LPPM tidak tersedia{% else %}❌ Link Digilib tidak tersedia{% endif %}
                     </button>
                 {% endif %}
             </div>
         </div>
 
+        <!-- KOLOM KANAN: ABSTRAK -->
         <div class="kolom-abstrak">
             <div class="abstrak-title">Abstrak / Intisari</div>
             <div class="abstrak-teks">
@@ -121,10 +137,7 @@
     </div>
 
     <script>
-        // Membaca mode gelap agar selaras dengan halaman sebelumnya
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
+        if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); }
     </script>
 </body>
 </html>

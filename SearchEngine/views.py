@@ -22,6 +22,8 @@ def search_view(request):
     
     # Filter Tambahan (Sudah aman dari typo)
     sumber = request.GET.get('sumber', 'semua').strip().lower()
+    if not sumber:
+        sumber = 'semua'
     tahun_min = request.GET.get('tahun_min', '')
     tahun_max = request.GET.get('tahun_max', '')
     fakultas = request.GET.get('fakultas', '') 
@@ -48,8 +50,14 @@ def search_view(request):
             if tahun_max and tahun_max.isdigit():
                 base_filters &= Q(year__lte=int(tahun_max))
 
-            # --- PERBAIKAN LIMIT (Dinaikkan agar LPPM tidak tenggelam) ---
-            fts_base = DokumenAkademik.objects.filter(base_filters, search_vector=query)
+            # --- PERBAIKAN LIMIT & TAMBAHAN PENCARIAN PENULIS ---
+            fts_base = DokumenAkademik.objects.filter(
+                base_filters & (
+                    Q(search_vector=query) | 
+                    Q(author__icontains=query_text) | 
+                    Q(title__icontains=query_text)
+                )
+            )
             fts_ids = list(fts_base.values_list('id', flat=True)[:3000])
             
             fuzzy_base = DokumenAkademik.objects.annotate(
@@ -89,7 +97,14 @@ def search_view(request):
         'fakultas': fakultas,
     }
     
-    template = 'semantic_results.html' if sumber == 'scholar' else 'search_results.html'
+    # --- PERBAIKAN: JALUR TEMPLATE 3 CABANG ---
+    if sumber == 'scholar':
+        template = 'semantic_results.html'
+    elif sumber == 'lppm':
+        template = 'lppm_results.html'
+    else:
+        template = 'search_results.html'
+        
     return render(request, template, context)
 
 def search_global_api(request):

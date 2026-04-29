@@ -73,16 +73,31 @@
                 </button>
                 <div id="dbDropdownMenu" class="db-dropdown">
                     <div class="db-icons">
-                        <input type="radio" name="sumber" id="db_digilib" value="digilib" onchange="document.getElementById('searchForm').submit();">
-                        <label for="db_digilib"><img src="{% static 'image/logo-unila.png' %}" alt="Digilib"> Digilib</label>
-                        <input type="radio" name="sumber" id="db_scholar" value="scholar" checked onchange="document.getElementById('searchForm').submit();">
-                        <label for="db_scholar"><div style="width:35px; height:35px; background:#e8f0fe; border-radius:50%; color:#4285f4; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;">📚</div> Semantic</label>
+                        <input type="radio" name="sumber" id="db_semua" value="semua" {% if sumber == 'semua' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
+                        <label for="db_semua">
+                            <div style="width:35px; height:35px; background:#f1f3f4; border-radius:50%; color:#5f6368; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;">🌐</div> Semua
+                        </label>
+
+                        <input type="radio" name="sumber" id="db_digilib" value="digilib" {% if sumber == 'digilib' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
+                        <label for="db_digilib">
+                            <img src="{% static 'image/logo-unila.png' %}" alt="Digilib"> Digilib
+                        </label>
+
+                        <input type="radio" name="sumber" id="db_lppm" value="lppm" {% if sumber == 'lppm' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
+                        <label for="db_lppm">
+                            <div style="width:35px; height:35px; background:#fce8e6; border-radius:50%; color:#d93025; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;">🏢</div> LPPM
+                        </label>
+
+                        <input type="radio" name="sumber" id="db_scholar" value="scholar" {% if sumber == 'scholar' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
+                        <label for="db_scholar">
+                            <div style="width:35px; height:35px; background:#e8f0fe; border-radius:50%; color:#4285f4; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;">📚</div> Semantic
+                        </label>
                     </div>
                 </div>
             </div>
 
             <div class="dropdown">
-                <button type="button" class="nav-btn" onclick="toggleFilterMenu()">▼ Alat Penelusuran</button>
+                <button type="button" class="nav-btn" onclick="toggleFilterMenu()">▼ Filter Pencarian</button>
                 <div id="filterMenu" class="dropdown-content">
                     <div class="filter-group">
                         <label>Fakultas:</label>
