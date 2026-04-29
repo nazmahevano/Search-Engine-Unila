@@ -1,49 +1,40 @@
 from django.db import models
-from django.contrib.postgres.search import SearchVectorField
-from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector, SearchVectorField
+from django.db.models import Value
+from django.db.models.functions import Coalesce
 
 class DokumenAkademik(models.Model):
-    # Primary Key (Wajib ada agar Django bisa panggil data spesifik)
-    id = models.BigIntegerField(primary_key=True) 
-    
-    # --- Hasil Perubahan ke Bahasa Inggris ---
-    identifier = models.CharField(max_length=255, null=True, blank=True, unique=True)
-    title = models.TextField() # Dulu: judul
-    author = models.CharField(max_length=255) # Dulu: penulis
-    abstract = models.TextField(null=True, blank=True) # Dulu: abstrak
-    date_release = models.CharField(max_length=50, null=True, blank=True) # Dulu: tanggal_terbit
-    source = models.CharField(max_length=50, default='digilib') # Dulu: sumber
-    
-    # --- Metadata & URL Legacy ---
-    url_asli = models.URLField(max_length=500, null=True, blank=True)
-    diambil_pada = models.DateTimeField(auto_now_add=True)
-    
-    # --- Kolom Struktur File Baru (URL PDF) ---
-    url_digilib = models.URLField(max_length=500, null=True, blank=True)
-    url_abstract = models.URLField(max_length=500, null=True, blank=True)
-    url_bab_1 = models.URLField(max_length=500, null=True, blank=True)
-    url_bab_2 = models.URLField(max_length=500, null=True, blank=True)
-    url_bab_3 = models.URLField(max_length=500, null=True, blank=True)
-    
-    # --- Kolom Akademik (Terbaru) ---
-    type = models.CharField(max_length=100, null=True, blank=True) # Jenis Dokumen (Skripsi, Tesis, Disertasi)
-    faculty = models.CharField(max_length=255, null=True, blank=True) # Fakultas
-    
+    identifier = models.CharField(max_length=255, unique=True)
+    title = models.TextField()
+    author = models.TextField(null=True, blank=True)
+    abstract = models.TextField(null=True, blank=True)
+    date_release = models.DateField(null=True, blank=True)
+    year = models.IntegerField(null=True, blank=True)
+    source = models.CharField(max_length=50)
+    access = models.CharField(max_length=20, default='public')
+    type = models.CharField(max_length=100, null=True, blank=True)
+    division = models.CharField(max_length=255, null=True, blank=True)
+    subject = models.CharField(max_length=255, null=True, blank=True)
+    relation = models.TextField(null=True, blank=True)
+    file_url = models.TextField(null=True, blank=True)
+    source_url = models.TextField(null=True, blank=True)
+    indexed_at = models.DateTimeField(auto_now_add=True)
+    synced_at = models.DateTimeField(null=True, blank=True)
     search_vector = SearchVectorField(null=True, blank=True)
-    
-    @property
-    def get_year(self):
-        if self.date_release and len(self.date_release) >= 4:
-            return self.date_release[:4]
-        return "-"
 
     class Meta:
-        managed = False  # WAJIB! Agar Django tidak mengubah tabel yang sudah ada
-        db_table = 'SearchEngine_dokumenakademik' # Harus persis nama tabel di Supabase
-        indexes = [
-            # Ini jalan tol paling sakti buat FTS
-            GinIndex(fields=['search_vector']),
-        ]
-
-    def __str__(self):
-        return self.title # Sekarang kita return title
+        managed = False # Tetap False karena tabel dibuat manual di Supabase
+        db_table = 'SearchEngine_dokumenakademik'
+    
+    def save(self, *args, **kwargs):
+        # 1. Simpan data ke database terlebih dahulu seperti biasa
+        super().save(*args, **kwargs)
+        
+        # 2. Setelah tersimpan dan mendapatkan ID, langsung perbarui bobot pencariannya khusus untuk data ini
+        vector = (
+            SearchVector(Coalesce('title', Value('', output_field=models.TextField()), output_field=models.TextField()), weight='A', config='indonesian') +
+            SearchVector(Coalesce('author', Value('', output_field=models.TextField()), output_field=models.TextField()), weight='B', config='indonesian') +
+            SearchVector(Coalesce('abstract', Value('', output_field=models.TextField()), output_field=models.TextField()), weight='C', config='indonesian')
+        )
+        # Update langsung ke ID dokumen yang baru saja disave
+        DokumenAkademik.objects.filter(pk=self.pk).update(search_vector=vector)

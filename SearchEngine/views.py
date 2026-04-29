@@ -1,107 +1,104 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Q
+from django.db.models import F, Q
+from django.db.models.functions import Lower
 from django.core.paginator import Paginator
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
 from django.http import JsonResponse
 from .models import DokumenAkademik
 from .services import SemanticScholarService
 from rest_framework import viewsets
 from .serializers import DokumenSerializer
 
-
 class DokumenViewSet(viewsets.ModelViewSet):
     queryset = DokumenAkademik.objects.all()
     serializer_class = DokumenSerializer
-    
-# --- 1. HALAMAN UTAMA ---
+
 def index(request):
     return render(request, 'index.html')
 
-# --- 2. VIEW UTAMA PENCARIAN (KHUSUS LOKAL/UNILA) ---
 def search_view(request):
-    """
-    View ini fokus nampilin hasil dari database lokal (Digilib Unila).
-    Hasil global dikosongkan karena akan dipanggil lewat AJAX oleh Rifdah.
-    """
     query_text = request.GET.get('q', '').strip()
     page_number = request.GET.get('page', 1)
     
-    # Parameter filter
-    sumber = request.GET.get('sumber', 'semua')
+    # Filter Tambahan (Sudah aman dari typo)
+    sumber = request.GET.get('sumber', 'semua').strip().lower()
     tahun_min = request.GET.get('tahun_min', '')
     tahun_max = request.GET.get('tahun_max', '')
-    fakultas = request.GET.get('fakultas', '') # TAMBAHAN: Ambil data fakultas dari URL
+    fakultas = request.GET.get('fakultas', '') 
 
     results_lokal = None
     total_found = 0
 
     if query_text:
-        # --- A. PROSES DIGILIB UNILA (LOKAL) ---
-        # Kita cuma proses lokal di sini biar loading halaman secepat kilat!
-        if sumber in ['semua', 'digilib']:
+        if sumber in ['semua', 'digilib', 'lppm']:
             query = SearchQuery(query_text, config='indonesian')
+            base_filters = Q(access='public')
             
-            base_queryset = DokumenAkademik.objects.filter(search_vector=query)
-            if tahun_min:
-                base_queryset = base_queryset.filter(date_release__gte=tahun_min)
-            if tahun_max:
-                base_queryset = base_queryset.filter(date_release__lte=f"{tahun_max}-12-31")
+            if sumber == 'digilib':
+                base_filters &= Q(source='DIGILIB')
+            elif sumber == 'lppm':
+                base_filters &= Q(source='LPPM')
+                
+            if fakultas:
+                base_filters &= Q(division__icontains=fakultas)
             
-            # TAMBAHAN: Lakukan filter ke kolom 'faculty' di database
-            if fakultas: 
-                base_queryset = base_queryset.filter(faculty__icontains=fakultas)
+            # --- PERBAIKAN TAHUN (Diubah jadi Integer) ---
+            if tahun_min and tahun_min.isdigit():
+                base_filters &= Q(year__gte=int(tahun_min))
+            if tahun_max and tahun_max.isdigit():
+                base_filters &= Q(year__lte=int(tahun_max))
 
-            matched_ids = base_queryset.order_by('-date_release').values_list('id', flat=True)[:1000]
+            # --- PERBAIKAN LIMIT (Dinaikkan agar LPPM tidak tenggelam) ---
+            fts_base = DokumenAkademik.objects.filter(base_filters, search_vector=query)
+            fts_ids = list(fts_base.values_list('id', flat=True)[:3000])
             
-            queryset = DokumenAkademik.objects.filter(
-                id__in=matched_ids
+            fuzzy_base = DokumenAkademik.objects.annotate(
+                sim_title=TrigramSimilarity(Lower('title'), query_text.lower()),
+                sim_author=TrigramSimilarity(Lower('author'), query_text.lower())
+            ).filter(
+                base_filters, 
+                Q(sim_title__gt=0.2) | Q(sim_author__gt=0.2) 
+            )
+            
+            fuzzy_ids = list(
+                fuzzy_base.annotate(total_sim=F('sim_title') + F('sim_author'))
+                          .order_by('-total_sim')
+                          .values_list('id', flat=True)[:1000]
+            )
+
+            all_ids = list(set(fts_ids + fuzzy_ids))
+            total_found = len(all_ids)
+
+            queryset = DokumenAkademik.objects.filter(id__in=all_ids).annotate(
+                rank=SearchRank('search_vector', query, weights=[0.05, 0.1, 0.1, 1.0], normalization=2),
+                similarity=TrigramSimilarity(Lower('title'), query_text.lower())
             ).annotate(
-                rank=SearchRank(
-                    'search_vector', 
-                    query, 
-                    weights=[0.05, 0.1, 0.1, 1.0],
-                    normalization=2 
-                )
-            ).order_by('-rank', '-date_release')
+                total_rank=(F('rank') + F('similarity'))
+            ).order_by('-total_rank', '-year')
             
-            total_found = len(matched_ids)
             paginator = Paginator(queryset, 10)
             results_lokal = paginator.get_page(page_number)
 
-    # Context untuk dikirim ke template
     context = {
         'page_obj': results_lokal,
         'query': query_text,
-        'total_hasil': f"{total_found}+" if total_found >= 1000 else total_found,
+        'total_hasil': f"{total_found}+" if total_found >= 3000 else total_found,
         'sumber': sumber,
         'tahun_min': tahun_min,
         'tahun_max': tahun_max,
-        'fakultas': fakultas, # TAMBAHAN: Jangan lupa kirim ke template agar pilihan tidak hilang
-        # 'global_results' sengaja gak diisi di sini biar gak nungguin API
+        'fakultas': fakultas,
     }
-    if sumber == 'scholar':
-        return render(request, 'semantic_results.html', context)
-    else:
-        return render(request, 'search_results.html', context)
-
-# --- 3. JALUR KHUSUS DATA GLOBAL (JSON UNTUK RIFDAH) ---
-def search_global_api(request):
-    """
-    Endpoint ini cuma balikin data mentah (JSON).
-    Rifdah bakal manggil ini pake JavaScript (AJAX).
-    """
-    query_text = request.GET.get('q', '').strip()
     
+    template = 'semantic_results.html' if sumber == 'scholar' else 'search_results.html'
+    return render(request, template, context)
+
+def search_global_api(request):
+    query_text = request.GET.get('q', '').strip()
     if not query_text:
         return JsonResponse({'results': []})
-        
-    # Panggil service (sudah ada Cache & Backoff di services.py lo)
     results = SemanticScholarService.search_papers(query_text)
-    
-    # Balikin data ke Rifdah
     return JsonResponse({'results': results})
 
-# --- 4. DETAIL VIEW ---
 def detail_view(request, id):
     skripsi = get_object_or_404(DokumenAkademik, id=id)
     return render(request, 'detail.html', {'skripsi': skripsi})

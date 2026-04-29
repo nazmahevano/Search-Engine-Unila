@@ -80,41 +80,23 @@
             
             <div class="info-box">
                 <div class="info-item"><strong>Penulis:</strong> {{ skripsi.author }}</div>
-                <div class="info-item"><strong>Tahun:</strong> {{ skripsi.date_release|slice:":4"|default:skripsi.date_release }}</div>
-                {% if skripsi.faculty %}
-                    <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.faculty }}</div>
+                <div class="info-item"><strong>Tahun:</strong> {{ skripsi.year}}</div>
+                {% if skripsi.division %}
+                    <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.division }}</div>
                 {% endif %}
             </div>
 
             <div class="area-tombol">
-                {% if skripsi.url_abstract %}
-                    <a href="{{ skripsi.url_abstract }}" target="_blank" class="btn-general btn-file">📄 Lihat Abstract (PDF)</a>
+                {% if skripsi.file_url %}
+                    <a href="{{ skripsi.file_url }}" target="_blank" class="btn-general btn-file">📄 Lihat Abstract (PDF)</a>
                 {% else %}
                     <button disabled class="btn-general disabled">❌ Abstract (PDF) Tidak Tersedia</button>
                 {% endif %}
 
-                {% if skripsi.url_bab_1 %}
-                    <a href="{{ skripsi.url_bab_1 }}" target="_blank" class="btn-general btn-bab">📁 BAB I</a>
-                {% else %}
-                    <button disabled class="btn-general disabled">❌ BAB I Tidak Tersedia</button>
-                {% endif %}
-
-                {% if skripsi.url_bab_2 %}
-                    <a href="{{ skripsi.url_bab_2 }}" target="_blank" class="btn-general btn-bab">📁 BAB II</a>
-                {% else %}
-                    <button disabled class="btn-general disabled">❌ BAB II Tidak Tersedia</button>
-                {% endif %}
-
-                {% if skripsi.url_bab_3 %}
-                    <a href="{{ skripsi.url_bab_3 }}" target="_blank" class="btn-general btn-bab">📁 BAB III</a>
-                {% else %}
-                    <button disabled class="btn-general disabled">❌ BAB III Tidak Tersedia</button>
-                {% endif %}
-
                 <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;"></div>
 
-                {% if skripsi.url_digilib %}
-                    <a href="{{ skripsi.url_digilib }}" target="_blank" class="btn-general btn-buka">
+                {% if skripsi.source_url %}
+                    <a href="{{ skripsi.source_url }}" target="_blank" class="btn-general btn-buka">
                         🔗 Buka Dokumen Asli di Digilib
                     </a>
                 {% else %}

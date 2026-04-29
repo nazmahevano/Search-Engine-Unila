@@ -149,8 +149,8 @@
             {% for item in page_obj %}
                 <div class="result-card">
                     <h3 class="title"><a href="/detail/{{ item.id }}/" style="text-decoration: none;">{{ item.title }}</a></h3>
-                    <div class="link-url">{% if item.url_digilib %}{{ item.url_digilib }}{% else %}digilib.universitas.ac.id/skripsi/{{ item.id }}{% endif %}</div>
-                    <div class="meta">{{ item.author }} - {{ item.date_release|date:"Y" }}</div>
+                    <div class="link-url">{% if item.source_url %}{{ item.source_url }}{% else %}digilib.universitas.ac.id/skripsi/{{ item.id }}{% endif %}</div>
+                    <div class="meta">{{ item.author }} - {{ item.year }}</div>
                     <div class="abstract" data-unprocessed="true">{{ item.abstract }}</div>
                 </div>
             {% endfor %}
