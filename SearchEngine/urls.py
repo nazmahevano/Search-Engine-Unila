@@ -6,18 +6,18 @@ router = DefaultRouter()
 router.register(r'dokumen', views.DokumenViewSet)
 
 urlpatterns = [
-    # 1. HALAMAN UTAMA: Langsung munculin index.html (Desain Rifdah)
+    # 1. HALAMAN UTAMA: Langsung munculin index.html (Desain Rifdah di sini!!)
     path('', views.search_view, name='index'), 
     
-    # 2. HALAMAN HASIL: Jalur saat tombol cari diklik
+    # 2. HALAMAN HASIL: Jalur pas ngeklik tombol search
     path('search/', views.search_view, name='search'),
     
-    # 3. HALAMAN DETAIL: Untuk melihat abstrak lengkap
+    # 3. HALAMAN DETAIL: Buat liat rincian dokumen kek abstrak dll. Digilib, LPPM, sama aja jalurnya
     path('detail/<int:id>/', views.detail_view, name='detail'),
     
-    # 4. JALUR API: Kita pindah ke /api/ biar gak tabrakan sama halaman utama
+    # 4. JALUR API: Pindah jalur ke /api/ biar gak tabrakan sama halaman utama
     path('api/', include(router.urls)),
     
-    # 5. JALUR API: Semantic Scholar (Global Search) - Bisa dipanggil dari JS atau mobile app
+    # 5. JALUR API: Kalau berhasil pakai OPAC hapus aja ini
     path('api/global-search/', views.search_global_api, name='api_global_search'),
 ]
