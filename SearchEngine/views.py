@@ -34,7 +34,7 @@ def search_view(request):
     if query_text:
         if sumber in ['semua', 'digilib', 'lppm']:
             query = SearchQuery(query_text, config='indonesian')
-            base_filters = Q(access='public')
+            base_filters = Q()
             
             if sumber == 'digilib':
                 base_filters &= Q(source='DIGILIB')

@@ -9,7 +9,7 @@ class DokumenAkademikAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'division', 'year', 'source')
     
     # Filter yang ada di sebelah kanan (Ini yang bikin error tadi)
-    list_filter = ('source', 'division', 'year', 'access')
+    list_filter = ('source', 'division', 'year',)
     
     # Fitur pencarian di admin panel
     search_fields = ('title', 'author', 'identifier')

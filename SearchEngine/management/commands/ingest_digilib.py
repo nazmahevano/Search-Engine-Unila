@@ -182,8 +182,8 @@ class Command(BaseCommand):
                         defaults={
                             'title': title_val, 'author': author_val, 'abstract': abstract_val,
                             'date_release': date_val, 'year': year_val, 'source': 'DIGILIB',
-                            'access': 'public', 'type': type_val, 'division': division_val,
-                            'subject': None, 'file_url': file_url_val, 'source_url': source_url_val,
+                            'type': type_val, 'division': division_val,
+                            'file_url': file_url_val, 'source_url': source_url_val,
                             'synced_at': now()
                         }
                     )
