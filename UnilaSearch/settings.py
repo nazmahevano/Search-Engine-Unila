@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.10.248.23', 'siktb.eng.unila.ac.id', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -157,5 +157,3 @@ CACHES = {
         'LOCATION': 'unique-snowflake',
     }
 }
-# === KONFIGURASI API EKSTERNAL ===
-SEMANTIC_SCHOLAR_API_KEY = os.environ.get("SEMANTIC_SCHOLAR_API_KEY")

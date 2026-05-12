@@ -11,10 +11,8 @@ class DokumenAkademik(models.Model):
     date_release = models.DateField(null=True, blank=True)
     year = models.IntegerField(null=True, blank=True)
     source = models.CharField(max_length=50)
-    access = models.CharField(max_length=20, default='public')
     type = models.CharField(max_length=100, null=True, blank=True)
     division = models.CharField(max_length=255, null=True, blank=True)
-    subject = models.CharField(max_length=255, null=True, blank=True)
     relation = models.TextField(null=True, blank=True)
     file_url = models.TextField(null=True, blank=True)
     source_url = models.TextField(null=True, blank=True)
@@ -23,11 +21,11 @@ class DokumenAkademik(models.Model):
     search_vector = SearchVectorField(null=True, blank=True)
 
     class Meta:
-        managed = False # Tetap False karena tabel dibuat manual di Supabase
+        managed = True
         db_table = 'SearchEngine_dokumenakademik'
     
     def save(self, *args, **kwargs):
-        # 1. Simpan data ke database terlebih dahulu seperti biasa
+        # 1. Simpan data ke database
         super().save(*args, **kwargs)
         
         # 2. Setelah tersimpan dan mendapatkan ID, langsung perbarui bobot pencariannya khusus untuk data ini
