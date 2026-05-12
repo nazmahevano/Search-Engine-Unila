@@ -9,13 +9,13 @@ from django.utils.timezone import now
 from django.db import models
 
 class Command(BaseCommand):
-    help = 'Harvest data FULL dari LPPM Unila via OAI-PMH (Anti-Badai & Auto-Resume & Filter URL)'
+    help = 'Ingesting metadata from LPPM Universitas Lampung via OAI-PMH'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write(self.style.SUCCESS("Memulai proses FULL Ingest Data LPPM... (Fitur Anti-Badai Aktif)"))
+        self.stdout.write(self.style.SUCCESS("Starting FULL Ingest Data LPPM via OAI-PMH"))
         
         base_url = 'http://repository.lppm.unila.ac.id/cgi/oai2'
-        TOKEN_FILE = 'lppm_resume_token.txt' # File penyimpan ingatan halaman
+        TOKEN_FILE = 'lppm_resume_token.txt'
         
         namespaces = {
             'oai': 'http://www.openarchives.org/OAI/2.0/',
@@ -23,14 +23,14 @@ class Command(BaseCommand):
             'dc': 'http://purl.org/dc/elements/1.1/'
         }
 
-        # --- LOGIKA AUTO-RESUME ---
+        # LOGIKA AUTO-RESUME
         params = {}
         if os.path.exists(TOKEN_FILE):
             with open(TOKEN_FILE, 'r') as f:
                 saved_token = f.read().strip()
             
             if saved_token:
-                self.stdout.write(self.style.WARNING(f"\n[INFO] Menemukan titik henti! Melanjutkan dari token: {saved_token[:15]}...\n"))
+                self.stdout.write(self.style.WARNING(f"\n[NOTE] Found resume point! Continuing from token: {saved_token[:15]}...\n"))
                 params = {'verb': 'ListRecords', 'resumptionToken': saved_token}
             else:
                 params = {'verb': 'ListRecords', 'metadataPrefix': 'oai_dc'}
@@ -43,31 +43,30 @@ class Command(BaseCommand):
         
         while True:
             try:
-                headers = {'User-Agent': 'SearchEngineUnila-Bot/1.0 (Skripsi Project)'}
+                headers = {'User-Agent': 'SearchEngineUnila-Machine/1.0 (Skripsi Project)'}
                 response = requests.get(base_url, params=params, headers=headers, timeout=60)
                 
                 if response.status_code == 503:
                     retry_after = int(response.headers.get('Retry-After', 60))
-                    self.stdout.write(self.style.WARNING(f"Server LPPM sibuk (503). Menunggu {retry_after} detik..."))
+                    self.stdout.write(self.style.WARNING(f"Error connection time out (503). Waiting {retry_after} seconds..."))
                     time.sleep(retry_after)
                     continue
                 
                 response.raise_for_status()
                 
-                # --- PERTAHANAN ANTI-BADAI XML ---
                 xml_text = response.text
                 xml_text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x84\x86-\x9f]', '', xml_text)
                 
                 try:
                     root = ET.fromstring(xml_text.encode('utf-8'))
                 except ET.ParseError as parse_err:
-                    self.stdout.write(self.style.WARNING(f"\n[SKIP] XML Hancur ({parse_err}). Mencoba melompati..."))
+                    self.stdout.write(self.style.WARNING(f"\n[SKIP] XML crash ({parse_err}). Try to next..."))
                     token_match = re.search(r'<resumptionToken[^>]*>(.*?)</resumptionToken>', xml_text)
                     if token_match and token_match.group(1):
                         token = token_match.group(1)
                         with open(TOKEN_FILE, 'w') as f: f.write(token)
                         params = {'verb': 'ListRecords', 'resumptionToken': token}
-                        self.stdout.write(self.style.SUCCESS(f"--- Token penyelamat ditemukan! Melompat... ---"))
+                        self.stdout.write(self.style.SUCCESS(f"Token was founded! Next..."))
                         time.sleep(2)
                         continue 
                     else:
@@ -81,8 +80,6 @@ class Command(BaseCommand):
                 records = root.findall('.//oai:record', namespaces)
                 
                 for record in records:
-                    if total_processed >= 100:
-                        break
                     total_processed += 1
 
                     header = record.find('oai:header', namespaces)
@@ -93,7 +90,7 @@ class Command(BaseCommand):
                     if metadata is None:
                         continue
 
-                    # 1. IDENTIFIER & ORIGINAL ID
+                    # 1. IDENTIFIER
                     oai_id_raw = header.find('oai:identifier', namespaces).text
                     original_id = oai_id_raw.split(':')[-1]
                     identifier_val = f"lppm_{original_id}"
@@ -138,7 +135,7 @@ class Command(BaseCommand):
                     # 8. SOURCE URL
                     source_url_val = f"http://repository.lppm.unila.ac.id/{original_id}/"
 
-                    # 9. RELATION (Hanya mengambil link eksternal)
+                    # 9. RELATION (URL eksternal)
                     relations = []
                     for rel in metadata.findall('dc:relation', namespaces):
                         if rel.text and rel.text.startswith('http'):
@@ -147,7 +144,7 @@ class Command(BaseCommand):
                                 
                     relation_val = "\n".join(relations) if relations else None
 
-                    # === SIMPAN KE DATABASE ===
+                    # SIMPAN KE DATABASE
                     obj, created = DokumenAkademik.objects.update_or_create(
                         identifier=identifier_val,
                         defaults={
@@ -169,43 +166,36 @@ class Command(BaseCommand):
                     if created:
                         total_saved += 1
                         
-                    if total_processed % 10 == 0:
-                        self.stdout.write(f"Sedang membaca sistem LPPM... ({total_processed} data dipindai, {total_saved} baru masuk DB)")
+                    if total_processed % 100 == 0:
+                        self.stdout.write(f"Scanning... ({total_processed} scanned data, {total_saved} just entered database)")
 
-                if total_processed >= 100:
-                    self.stdout.write(self.style.SUCCESS("\n[TEST MODE] Berhasil memproses 100 data uji coba LPPM. Proses dihentikan!"))
-                    break
-                
                 # Paginasi & Simpan Token
                 resumption_token = root.find('.//oai:resumptionToken', namespaces)
                 if resumption_token is not None and resumption_token.text:
                     token = resumption_token.text
                     page_count += 1
-                    self.stdout.write(self.style.SUCCESS(f"--- Selesai Halaman {page_count-1}. Lanjut Halaman {page_count} ---"))
-                    
-                    # Simpan token ke file
+                    self.stdout.write(self.style.SUCCESS(f"--- Finished {page_count-1}. Continuing to Page {page_count} ---"))
+
                     with open(TOKEN_FILE, 'w') as f: 
                         f.write(token)
                         
                     params = {'verb': 'ListRecords', 'resumptionToken': token}
                     time.sleep(2)  
                 else:
-                    self.stdout.write(self.style.SUCCESS("\nSemua data di server LPPM sudah habis diproses!"))
+                    self.stdout.write(self.style.SUCCESS("\nAll data in LPPM server has been processed!"))
                     if os.path.exists(TOKEN_FILE): 
-                        os.remove(TOKEN_FILE) # Hapus file token kalau sudah selesai 100%
+                        os.remove(TOKEN_FILE)
                     break
 
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"\nTerjadi kesalahan jaringan atau sistem: {str(e)}"))
-                self.stdout.write(self.style.WARNING("Tinggal jalankan ulang script ini, nanti akan otomatis lanjut dari halaman terakhir."))
+                self.stdout.write(self.style.WARNING("Just run the script again, it will automatically continue from the last page."))
                 break
                 
-        self.stdout.write(self.style.SUCCESS(f"\nPROSES HARVEST LPPM SELESAI. Total dipindai: {total_processed} | Total baru: {total_saved}"))
-        
-        # ========================================================
-        # UPDATE PEMBOBOTAN PENCARIAN (FTS) SANGAT CEPAT
-        # ========================================================
-        self.stdout.write(self.style.WARNING("\nMemulai proses update indeks pencarian (FTS)..."))
+        self.stdout.write(self.style.SUCCESS(f"\nProcess Harvest finished. Total scanned: {total_processed} | Total new entries: {total_saved}"))
+
+        # PEMBOBOTAN PENCARIAN (FTS)
+        self.stdout.write(self.style.WARNING("\nStarting process update search index (FTS)..."))
         from django.contrib.postgres.search import SearchVector
         from django.db.models import Value
         from django.db.models.functions import Coalesce
@@ -220,4 +210,4 @@ class Command(BaseCommand):
         updated_count = DokumenAkademik.objects.filter(search_vector__isnull=True).update(search_vector=vector)
         
         duration = time.time() - start_time
-        self.stdout.write(self.style.SUCCESS(f"Selesai! {updated_count} data baru berhasil diindeks dalam {duration:.2f} detik. Sistem siap digunakan!"))
+        self.stdout.write(self.style.SUCCESS(f"Finished! {updated_count} new data successfully indexed in {duration:.2f} seconds. System is ready for use!"))

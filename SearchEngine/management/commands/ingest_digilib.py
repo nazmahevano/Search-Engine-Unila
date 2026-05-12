@@ -10,13 +10,11 @@ from django.utils.timezone import now
 from django.db import models
 
 class Command(BaseCommand):
-    help = 'Harvest data FULL dari Digilib Unila via OAI-PMH (Anti-Badai XML Rusak & Auto-Resume)'
+    help = 'Ingesting metadata from Digilib Universitas Lampung via OAI-PMH'
 
     def get_full_division_name(self, texts):
-        # Menggabungkan semua (Publisher, Subject, Description)
         full_text = " ".join(filter(None, texts)).upper()
         
-        # LOGIKA SUPER (Gabungan Keyword & Kode DDC Perpustakaan)
         if any(x in full_text for x in ['PENDIDIKAN', 'KEGURUAN', '370', 'FKIP', 'PGSD', 'PAUD']): 
             return 'Fakultas Keguruan dan Ilmu Pendidikan'
         if any(x in full_text for x in ['HUKUM', '340', 'FH']): 
@@ -39,7 +37,7 @@ class Command(BaseCommand):
         return None
 
     def handle(self, *args, **kwargs):
-        self.stdout.write(self.style.SUCCESS("Memulai proses FULL Ingest Data Digilib (Anti-Badai + Logika DDC Mode)..."))
+        self.stdout.write(self.style.SUCCESS("Starting FULL Ingest Metadata Digilib via OAI-PMH"))
         
         base_url = 'http://digilib.unila.ac.id/cgi/oai2'
         TOKEN_FILE = 'digilib_resume_token.txt' 
@@ -50,14 +48,14 @@ class Command(BaseCommand):
             'dc': 'http://purl.org/dc/elements/1.1/'
         }
 
-        # --- LOGIKA AUTO-RESUME ---
+        # LOGIKA AUTO-RESUME DENGAN TOKEN
         params = {}
         if os.path.exists(TOKEN_FILE):
             with open(TOKEN_FILE, 'r') as f:
                 saved_token = f.read().strip()
             
             if saved_token:
-                self.stdout.write(self.style.WARNING(f"\n[INFO] Menemukan titik henti! Melanjutkan dari token: {saved_token[:15]}...\n"))
+                self.stdout.write(self.style.WARNING(f"\n[NOTE] Found resume point! Continuing from token: {saved_token[:15]}...\n"))
                 params = {'verb': 'ListRecords', 'resumptionToken': saved_token}
             else:
                 params = {'verb': 'ListRecords', 'metadataPrefix': 'oai_dc'}
@@ -70,31 +68,30 @@ class Command(BaseCommand):
         
         while True:
             try:
-                headers = {'User-Agent': 'SearchEngineUnila-Bot/1.0 (Skripsi Project)'}
+                headers = {'User-Agent': 'SearchEngineUnila-Machine (Skripsi Project)'}
                 response = requests.get(base_url, params=params, headers=headers, timeout=60) 
                 
                 if response.status_code == 503:
                     retry_after = int(response.headers.get('Retry-After', 60))
-                    self.stdout.write(self.style.WARNING(f"Server Unila sibuk (503). Menunggu {retry_after} detik..."))
+                    self.stdout.write(self.style.WARNING(f"Error connection time out (503). Waiting {retry_after} seconds..."))
                     time.sleep(retry_after)
                     continue
                 
                 response.raise_for_status()
                 
-                # --- PERTAHANAN ANTI-BADAI XML ---
                 xml_text = response.text
                 xml_text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x84\x86-\x9f]', '', xml_text)
                 
                 try:
                     root = ET.fromstring(xml_text.encode('utf-8'))
                 except ET.ParseError as parse_err:
-                    self.stdout.write(self.style.WARNING(f"\n[SKIP] XML Hancur ({parse_err}). Mencoba melompati..."))
+                    self.stdout.write(self.style.WARNING(f"\n[SKIP] XML Crash ({parse_err}). Try to Next..."))
                     token_match = re.search(r'<resumptionToken[^>]*>(.*?)</resumptionToken>', xml_text)
                     if token_match and token_match.group(1):
                         token = token_match.group(1)
                         with open(TOKEN_FILE, 'w') as f: f.write(token)
                         params = {'verb': 'ListRecords', 'resumptionToken': token}
-                        self.stdout.write(self.style.SUCCESS(f"--- Token penyelamat ditemukan! Melompat... ---"))
+                        self.stdout.write(self.style.SUCCESS(f"Token was founded! Next..."))
                         time.sleep(2)
                         continue 
                     else:
@@ -108,8 +105,6 @@ class Command(BaseCommand):
                 records = root.findall('.//oai:record', namespaces)
                 
                 for record in records:
-                    if total_processed >= 100:
-                        break
                     total_processed += 1
                     header = record.find('oai:header', namespaces)
                     if header is not None and header.get('status') == 'deleted': continue
@@ -143,12 +138,10 @@ class Command(BaseCommand):
                             date_val = datetime.strptime(date_str[:10], '%Y-%m-%d').date()
                         except ValueError: pass 
 
-                    # 6. DIVISION (FAKULTAS) - SEKARANG JAUH LEBIH PINTAR
-                    # 6. DIVISION (FAKULTAS) & SUBJECT (JURUSAN)
+                    # 6. DIVISION
                     publisher_elem = metadata.find('dc:publisher', namespaces)
                     subjects = metadata.findall('dc:subject', namespaces)
                     
-                    # HANYA membaca Publisher dan Subject (DDC), JANGAN membaca Abstrak/Judul
                     texts_to_analyze = []
                     if publisher_elem is not None and publisher_elem.text: 
                         texts_to_analyze.append(publisher_elem.text)
@@ -176,7 +169,7 @@ class Command(BaseCommand):
                     if relation_elem is not None and relation_elem.text and relation_elem.text.startswith('http'):
                         source_url_val = relation_elem.text
 
-                    # === SIMPAN KE DATABASE ===
+                    # SIMPAN KE DATABASE
                     obj, created = DokumenAkademik.objects.update_or_create(
                         identifier=identifier_val,
                         defaults={
@@ -188,37 +181,31 @@ class Command(BaseCommand):
                         }
                     )
                     if created: total_saved += 1
-                    if total_processed % 10 == 0:
-                        self.stdout.write(f"Scanning... ({total_processed} data dipindai, {total_saved} baru masuk DB)")
-
-                if total_processed >= 100:
-                    self.stdout.write(self.style.SUCCESS("\n[TEST MODE] Berhasil memproses 100 data uji coba. Proses dihentikan!"))
-                    break
+                    if total_processed % 100 == 0:
+                        self.stdout.write(f"Scanning... ({total_processed} scanned data, {total_saved} just entered database)")
                 
                 # Paginasi & Simpan Token
                 resumption_token = root.find('.//oai:resumptionToken', namespaces)
                 if resumption_token is not None and resumption_token.text:
                     token = resumption_token.text
                     page_count += 1
-                    self.stdout.write(self.style.SUCCESS(f"--- Selesai. Lanjut ke Halaman {page_count} ---"))
+                    self.stdout.write(self.style.SUCCESS(f"--- Finished. Continuing to Page {page_count} ---"))
                     with open(TOKEN_FILE, 'w') as f: f.write(token)
                     params = {'verb': 'ListRecords', 'resumptionToken': token}
                     time.sleep(2) 
                 else:
-                    self.stdout.write(self.style.SUCCESS("\nSemua data di server Digilib sudah habis diproses!"))
+                    self.stdout.write(self.style.SUCCESS("\nAll data in Digilib server has been processed!"))
                     if os.path.exists(TOKEN_FILE): os.remove(TOKEN_FILE)
                     break
 
             except Exception as e:
-                self.stdout.write(self.style.ERROR(f"\nTerjadi kesalahan: {str(e)}. Jalankan ulang script untuk resume."))
+                self.stdout.write(self.style.ERROR(f"\nSomething went wrong: {str(e)}. Run the script again to resume."))
                 break
                 
-        self.stdout.write(self.style.SUCCESS(f"\nPROSES HARVEST SELESAI. Total dipindai: {total_processed} | Total baru: {total_saved}"))
+        self.stdout.write(self.style.SUCCESS(f"\nProcess Harvest finished. Total scanned: {total_processed} | Total new: {total_saved}"))
         
-        # ========================================================
-        # UPDATE PEMBOBOTAN PENCARIAN (FTS) SANGAT CEPAT
-        # ========================================================
-        self.stdout.write(self.style.WARNING("\nMemulai proses update indeks pencarian (FTS)..."))
+        # PEMBOBOTAN PENCARIAN (FTS)
+        self.stdout.write(self.style.WARNING("\nStarting search index update (FTS)..."))
         from django.contrib.postgres.search import SearchVector
         from django.db.models import Value
         from django.db.models.functions import Coalesce
@@ -232,4 +219,4 @@ class Command(BaseCommand):
         
         updated_count = DokumenAkademik.objects.filter(search_vector__isnull=True).update(search_vector=vector)
         duration = time.time() - start_time
-        self.stdout.write(self.style.SUCCESS(f"Selesai! {updated_count} data baru berhasil diindeks dalam {duration:.2f} detik. Sistem siap digunakan!"))
+        self.stdout.write(self.style.SUCCESS(f"Finished! {updated_count} new data successfully indexed in {duration:.2f} seconds. System is ready for use!"))
