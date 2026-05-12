@@ -13,7 +13,7 @@ class Command(BaseCommand):
     help = 'Harvest data FULL dari Digilib Unila via OAI-PMH (Anti-Badai XML Rusak & Auto-Resume)'
 
     def get_full_division_name(self, texts):
-        # Menggabungkan semua teks (Publisher, Subject, Description)
+        # Menggabungkan semua (Publisher, Subject, Description)
         full_text = " ".join(filter(None, texts)).upper()
         
         # LOGIKA SUPER (Gabungan Keyword & Kode DDC Perpustakaan)
