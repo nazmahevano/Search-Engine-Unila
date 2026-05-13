@@ -5,7 +5,6 @@ from django.core.paginator import Paginator
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
 from django.http import JsonResponse
 from .models import DokumenAkademik
-from .services import SemanticScholarService
 from rest_framework import viewsets
 from .serializers import DokumenSerializer
 

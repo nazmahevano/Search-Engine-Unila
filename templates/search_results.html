@@ -104,11 +104,6 @@
                         <label for="db_lppm">
                             <div style="width:35px; height:35px; background:#fce8e6; border-radius:50%; color:#d93025; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;">🏢</div> LPPM
                         </label>
-
-                        <input type="radio" name="sumber" id="db_scholar" value="scholar" {% if sumber == 'scholar' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
-                        <label for="db_scholar">
-                            <div style="width:35px; height:35px; background:#e8f0fe; border-radius:50%; color:#4285f4; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;">📚</div> Semantic
-                        </label>
                     </div>
                 </div>
             </div>
@@ -177,15 +172,6 @@
 
         {% if total_hasil == 0 %}
             <p style="color: #5f6368; font-size: 1.1rem;">Penelusuran lokal tidak menemukan dokumen apa pun.</p>
-        {% endif %}
-
-        <!-- ================= BAGIAN 2: HASIL GLOBAL SEMANTIC SCHOLAR (KHUSUS MODE "SEMUA") ================= -->
-        {% if sumber == 'semua' %}
-            <div id="semantic-results-container">
-                <div id="semantic-loading" style="padding: 20px 0; color: #1a73e8; font-weight: bold;">
-                    <span class="loader"></span> Sedang mengambil data jurnal global dari Semantic Scholar...
-                </div>
-            </div>
         {% endif %}
 
         <!-- Pagination Khusus Lokal -->
@@ -283,61 +269,6 @@
                 });
             }
         }
-
-        // ================= AJAX SEMANTIC (KHUSUS MODE SEMUA) =================
-        document.addEventListener("DOMContentLoaded", function() {
-            // Highlight Digilib & LPPM
-            applyHighlightAndSnippet('#local-results-container');
-
-            const queryText = "{{ query|escapejs }}".trim();
-            const sumber = "{{ sumber|escapejs }}";
-
-            // Jika "Semua Database", tarik data tambahan dari Semantic Scholar via AJAX
-            if (queryText && sumber === 'semua') {
-                fetch(`/search_global_api/?q=${encodeURIComponent(queryText)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const container = document.getElementById('semantic-results-container');
-                        const loadingDiv = document.getElementById('semantic-loading');
-                        if (loadingDiv) loadingDiv.remove();
-
-                        if (data.results && data.results.length > 0) {
-                            let htmlContent = `
-                            <div style="margin: 40px 0 20px 0; border-top: 2px dashed #ebebeb; padding-top: 20px;">
-                                <h2 style="font-size: 1.1rem; color: #5f6368; text-transform: uppercase;">🌐 Jurnal Global (Semantic Scholar)</h2>
-                            </div>`;
-                            
-                            data.results.forEach(item => {
-                                const title = item.title || "Tanpa Judul";
-                                const link = item.url || "#";
-                                const year = item.year || "Tahun tidak diketahui";
-                                const abstract = item.abstract || "Abstrak tidak tersedia.";
-                                let authorStr = "Anonim";
-                                if (item.authors && item.authors.length > 0) {
-                                    authorStr = item.authors.map(a => a.name).join(", ");
-                                }
-
-                                htmlContent += `
-                                <div class="result-card semantic-card">
-                                    <h3 class="title"><a href="${link}" target="_blank">${title}</a></h3>
-                                    <div class="link-url">semanticscholar.org</div>
-                                    <div class="meta">${authorStr} - ${year}</div>
-                                    <div class="abstract" data-unprocessed="true">${abstract}</div>
-                                </div>`;
-                            });
-
-                            container.innerHTML = htmlContent;
-                            applyHighlightAndSnippet('#semantic-results-container');
-                        } else {
-                            container.innerHTML = `<p style="color: #5f6368; font-size: 1.1rem; margin-top: 20px;">Semantic Scholar tidak menemukan dokumen tambahan.</p>`;
-                        }
-                    })
-                    .catch(error => {
-                        const loadingDiv = document.getElementById('semantic-loading');
-                        if (loadingDiv) loadingDiv.innerHTML = `❌ Gagal memuat data dari Semantic Scholar.`;
-                    });
-            }
-        });
     </script>
 </body>
 </html>
