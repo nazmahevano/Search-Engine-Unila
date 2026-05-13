@@ -84,18 +84,13 @@ WSGI_APPLICATION = 'UnilaSearch.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'unila_search',
-        'USER': 'unila_admin',
-        'PASSWORD': 'admin123',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL')
+    )
 }
 
 DATABASES['default']['OPTIONS'] = {
-    'sslmode': 'require',
+    'sslmode': 'disable',
 }
 
 # Password validation
@@ -151,3 +146,12 @@ CACHES = {
         'LOCATION': 'unique-snowflake',
     }
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://siktb.eng.unila.ac.id',
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
