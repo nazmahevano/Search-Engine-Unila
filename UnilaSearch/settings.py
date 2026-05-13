@@ -146,3 +146,9 @@ CACHES = {
         'LOCATION': 'unique-snowflake',
     }
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://siktb.eng.unila.ac.id',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
