@@ -24,12 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG') == 'True'
+DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = allowed_hosts_env.split(',') if allowed_hosts_env else []
 
 # Application definition
 
@@ -83,21 +84,13 @@ WSGI_APPLICATION = 'UnilaSearch.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    # Database Baru (Supabase) - Kita jadikan default agar data pindah ke sini
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    ),
-    
-    # Database Lama (Laptop Kamu) - Kita kasih nama 'lokal'
-    'local': {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+        'NAME': 'unila_search',
+        'USER': 'unila_admin',
+        'PASSWORD': 'admin123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -140,6 +133,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
@@ -157,5 +151,3 @@ CACHES = {
         'LOCATION': 'unique-snowflake',
     }
 }
-# === KONFIGURASI API EKSTERNAL ===
-SEMANTIC_SCHOLAR_API_KEY = os.environ.get("SEMANTIC_SCHOLAR_API_KEY")
