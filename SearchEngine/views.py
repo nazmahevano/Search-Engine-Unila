@@ -96,10 +96,8 @@ def search_view(request):
         'fakultas': fakultas,
     }
     
-    # --- PERBAIKAN: JALUR TEMPLATE 3 CABANG ---
-    if sumber == 'scholar':
-        template = 'semantic_results.html'
-    elif sumber == 'lppm':
+    # --- PERBAIKAN: JALUR TEMPLATE 3 CABANG --
+    if sumber == 'lppm':
         template = 'lppm_results.html'
     else:
         template = 'search_results.html'
