@@ -17,7 +17,4 @@ urlpatterns = [
     
     # 4. JALUR API: Pindah jalur ke /api/ biar gak tabrakan sama halaman utama
     path('api/', include(router.urls)),
-    
-    # 5. JALUR API: Kalau berhasil pakai OPAC hapus aja ini
-    path('api/global-search/', views.search_global_api, name='api_global_search'),
 ]

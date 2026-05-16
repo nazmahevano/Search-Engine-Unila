@@ -19,16 +19,19 @@ def search_view(request):
     query_text = request.GET.get('q', '').strip()
     page_number = request.GET.get('page', 1)
     
-    # Filter Tambahan (Sudah aman dari typo)
-    sumber = request.GET.get('sumber', 'semua').strip().lower()
+    # Filter Tambahan
+    sumber = request.GET.get('sumber', '').strip().lower()
     if not sumber:
         sumber = 'semua'
+        
     tahun_min = request.GET.get('tahun_min', '')
     tahun_max = request.GET.get('tahun_max', '')
     fakultas = request.GET.get('fakultas', '') 
 
     results_lokal = None
     total_found = 0
+    total_digilib = 0
+    total_lppm = 0
 
     if query_text:
         if sumber in ['semua', 'digilib', 'lppm']:
@@ -43,13 +46,12 @@ def search_view(request):
             if fakultas:
                 base_filters &= Q(division__icontains=fakultas)
             
-            # --- PERBAIKAN TAHUN (Diubah jadi Integer) ---
             if tahun_min and tahun_min.isdigit():
                 base_filters &= Q(year__gte=int(tahun_min))
             if tahun_max and tahun_max.isdigit():
                 base_filters &= Q(year__lte=int(tahun_max))
 
-            # --- PERBAIKAN LIMIT & TAMBAHAN PENCARIAN PENULIS ---
+            # FTS & Fuzzy Search
             fts_base = DokumenAkademik.objects.filter(
                 base_filters & (
                     Q(search_vector=query) | 
@@ -75,6 +77,11 @@ def search_view(request):
 
             all_ids = list(set(fts_ids + fuzzy_ids))
             total_found = len(all_ids)
+            
+            # --- MENGHITUNG ANGKA PASTI PER DATABASE ---
+            if total_found > 0:
+                total_digilib = DokumenAkademik.objects.filter(id__in=all_ids, source='DIGILIB').count()
+                total_lppm = DokumenAkademik.objects.filter(id__in=all_ids, source='LPPM').count()
 
             queryset = DokumenAkademik.objects.filter(id__in=all_ids).annotate(
                 rank=SearchRank('search_vector', query, weights=[0.05, 0.1, 0.1, 1.0], normalization=2),
@@ -89,27 +96,22 @@ def search_view(request):
     context = {
         'page_obj': results_lokal,
         'query': query_text,
-        'total_hasil': f"{total_found}+" if total_found >= 3000 else total_found,
+        'total_hasil': total_found,
+        'total_digilib': total_digilib,
+        'total_lppm': total_lppm,
         'sumber': sumber,
         'tahun_min': tahun_min,
         'tahun_max': tahun_max,
         'fakultas': fakultas,
     }
     
-    # --- PERBAIKAN: JALUR TEMPLATE 3 CABANG --
+    # Jalur Template (Semantic Dihapus)
     if sumber == 'lppm':
         template = 'lppm_results.html'
     else:
         template = 'search_results.html'
         
     return render(request, template, context)
-
-def search_global_api(request):
-    query_text = request.GET.get('q', '').strip()
-    if not query_text:
-        return JsonResponse({'results': []})
-    results = SemanticScholarService.search_papers(query_text)
-    return JsonResponse({'results': results})
 
 def detail_view(request, id):
     skripsi = get_object_or_404(DokumenAkademik, id=id)

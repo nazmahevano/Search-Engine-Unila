@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <title>{{ skripsi.title }} - Detail Dokumen</title>
+    <link rel="icon" href="{% static 'image/logo-unila.png' %}" type="image/png">
     <style>
         body { font-family: Arial, sans-serif; background: #ffffff; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
         .top-nav { padding: 15px 40px; border-bottom: 1px solid #ebebeb; display: flex; gap: 10px; }
@@ -67,8 +69,8 @@
                     {% if skripsi.year %}{{ skripsi.year }}{% elif skripsi.date_release %}{{ skripsi.date_release|date:"Y" }}{% else %}Tidak diketahui{% endif %}
                 </div>
                 <!-- Fakultas hanya muncul jika datanya ada -->
-                {% if skripsi.faculty %}
-                    <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.faculty }}</div>
+                {% if skripsi.division %}
+                    <div class="info-item"><strong>Fakultas:</strong> {{ skripsi.division }}</div>
                 {% endif %}
             </div>
 
@@ -82,30 +84,7 @@
                     <button disabled class="btn-general disabled">❌ Abstract (PDF) Tidak Tersedia</button>
                 {% endif %}
 
-                <!-- TAMPILKAN TOMBOL BAB 1-3 HANYA JIKA BUKAN LPPM -->
-                {% if skripsi.source != 'LPPM' %}
-                    {% if skripsi.url_bab_1 %}
-                        <a href="{{ skripsi.url_bab_1 }}" target="_blank" class="btn-general btn-bab">📁 BAB I</a>
-                    {% else %}
-                        <button disabled class="btn-general disabled">❌ BAB I Tidak Tersedia</button>
-                    {% endif %}
-
-                    {% if skripsi.url_bab_2 %}
-                        <a href="{{ skripsi.url_bab_2 }}" target="_blank" class="btn-general btn-bab">📁 BAB II</a>
-                    {% else %}
-                        <button disabled class="btn-general disabled">❌ BAB II Tidak Tersedia</button>
-                    {% endif %}
-
-                    {% if skripsi.url_bab_3 %}
-                        <a href="{{ skripsi.url_bab_3 }}" target="_blank" class="btn-general btn-bab">📁 BAB III</a>
-                    {% else %}
-                        <button disabled class="btn-general disabled">❌ BAB III Tidak Tersedia</button>
-                    {% endif %}
-                {% endif %}
-
-                <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;"></div>
-
-                <!-- 2. Tombol Dokumen Asli: Cek source_url (LPPM) atau url_digilib (Digilib) -->
+                <!-- Tombol Dokumen Asli: Cek source_url (LPPM) atau url_digilib (Digilib) -->
                 {% if skripsi.source_url %}
                     <a href="{{ skripsi.source_url }}" target="_blank" class="btn-general {% if skripsi.source == 'LPPM' %}btn-lppm{% else %}btn-buka{% endif %}">
                         {% if skripsi.source == 'LPPM' %}🔗 Buka Dokumen di LPPM{% else %}🔗 Buka Dokumen Asli{% endif %}
