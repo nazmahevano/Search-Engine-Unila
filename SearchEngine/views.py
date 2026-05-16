@@ -1,3 +1,4 @@
+import time
 from django.shortcuts import render, get_object_or_404
 from django.db.models import F, Q
 from django.db.models.functions import Lower
@@ -16,6 +17,8 @@ def index(request):
     return render(request, 'index.html')
 
 def search_view(request):
+    start_time = time.time() # <-- WAKTU MULAI
+
     query_text = request.GET.get('q', '').strip()
     page_number = request.GET.get('page', 1)
     
@@ -32,6 +35,7 @@ def search_view(request):
     total_found = 0
     total_digilib = 0
     total_lppm = 0
+    waktu_eksekusi = 0
 
     if query_text:
         if sumber in ['semua', 'digilib', 'lppm']:
@@ -59,6 +63,22 @@ def search_view(request):
                     Q(title__icontains=query_text)
                 )
             )
+
+            # --- PERBAIKAN: MENGHITUNG ANGKA PASTI DARI DATABASE SEBELUM DILIMIT ---
+            total_found = fts_base.count()
+            
+            if sumber == 'semua':
+                total_digilib = fts_base.filter(source='DIGILIB').count()
+                total_lppm = fts_base.filter(source='LPPM').count()
+            elif sumber == 'digilib':
+                total_digilib = total_found
+                total_lppm = 0
+            elif sumber == 'lppm':
+                total_digilib = 0
+                total_lppm = total_found
+            # ----------------------------------------------------------------------
+
+            # Baru potong/limit hasilnya setelah dihitung
             fts_ids = list(fts_base.values_list('id', flat=True)[:3000])
             
             fuzzy_base = DokumenAkademik.objects.annotate(
@@ -76,12 +96,6 @@ def search_view(request):
             )
 
             all_ids = list(set(fts_ids + fuzzy_ids))
-            total_found = len(all_ids)
-            
-            # --- MENGHITUNG ANGKA PASTI PER DATABASE ---
-            if total_found > 0:
-                total_digilib = DokumenAkademik.objects.filter(id__in=all_ids, source='DIGILIB').count()
-                total_lppm = DokumenAkademik.objects.filter(id__in=all_ids, source='LPPM').count()
 
             queryset = DokumenAkademik.objects.filter(id__in=all_ids).annotate(
                 rank=SearchRank('search_vector', query, weights=[0.05, 0.1, 0.1, 1.0], normalization=2),
@@ -93,6 +107,9 @@ def search_view(request):
             paginator = Paginator(queryset, 10)
             results_lokal = paginator.get_page(page_number)
 
+    end_time = time.time() # <-- WAKTU SELESAI
+    waktu_eksekusi = str(round(end_time - start_time, 3)).replace('.', ',') 
+
     context = {
         'page_obj': results_lokal,
         'query': query_text,
@@ -103,9 +120,9 @@ def search_view(request):
         'tahun_min': tahun_min,
         'tahun_max': tahun_max,
         'fakultas': fakultas,
+        'waktu_eksekusi': waktu_eksekusi, 
     }
     
-    # Jalur Template (Semantic Dihapus)
     if sumber == 'lppm':
         template = 'lppm_results.html'
     else:
@@ -116,3 +133,12 @@ def search_view(request):
 def detail_view(request, id):
     skripsi = get_object_or_404(DokumenAkademik, id=id)
     return render(request, 'detail.html', {'skripsi': skripsi})
+
+def autocomplete_api(request):
+    query = request.GET.get('q', '').strip()
+    # Mulai cari saran jika pengguna sudah mengetik lebih dari 2 huruf
+    if len(query) > 2:
+        # Mengambil 5 judul skripsi yang mengandung kata yang diketik
+        saran = DokumenAkademik.objects.filter(title__icontains=query).values_list('title', flat=True)[:5]
+        return JsonResponse(list(saran), safe=False)
+    return JsonResponse([], safe=False)

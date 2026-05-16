@@ -48,6 +48,7 @@
             display: flex;
             align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative; /* PENTING UNTUK AUTOCOMPLETE */
         }
 
         .search-icon {
@@ -73,6 +74,37 @@
             width: 100%; 
             color: #333; 
         }
+
+        /* === CSS AUTOCOMPLETE SARAN KATA === */
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 25px 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 99;
+            overflow: hidden;
+            text-align: left;
+            margin-top: 1px;
+        }
+        .suggestion-item { 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            color: #333; 
+            font-size: 1rem; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .suggestion-item:hover { background-color: #f1f3f4; }
+        /* =================================== */
 
         .services-container {
             margin-top: 3rem;
@@ -141,14 +173,15 @@
         <h1 id="animated-title" style="color: blue; text-align: center;">Mulai Pencarian</h1>
         
         <form action="/search/" method="GET" id="mainSearchForm">
-            <div class="search-bar">
+            <div class="search-bar" id="search-bar-container">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="search-input" class="search-input" name="q" placeholder="Masukkan kata kunci pencarian...">
+                <input type="text" id="search-input" class="search-input" name="q" autocomplete="off" placeholder="Masukkan kata kunci pencarian...">
+                
+                <div id="autocomplete-list" class="autocomplete-suggestions" style="display: none;"></div>
             </div>
         </form>
 
         <div class="services-container">
-            <!-- Tombol Digilib -->
             <a href="javascript:void(0)" onclick="cariDenganSumber('digilib')" class="service-tile" style="text-decoration: none;">
                 <div class="icon-container">
                     <img src="{% static 'image/logo-unila.png' %}" alt="Digilib" style="width: 50px;">
@@ -156,7 +189,6 @@
                 <p>Digilib</p>
             </a>
 
-            <!-- TAMBAHAN: Tombol LPPM -->
             <a href="javascript:void(0)" onclick="cariDenganSumber('lppm')" class="service-tile" style="text-decoration: none;">
                 <div class="icon-container">
                     <img src="{% static 'image/LPPM-UNILA-LOGGO.png' %}" alt="LPPM" style="width: 50px;">
@@ -180,11 +212,13 @@
             }
         }
 
-        // Animasi Gelombang
         document.addEventListener("DOMContentLoaded", function() {
             const titleElement = document.getElementById("animated-title");
             const searchInput = document.getElementById("search-input");
+            const suggestBox = document.getElementById('autocomplete-list');
+            const searchBarContainer = document.getElementById('search-bar-container');
 
+            // 1. Animasi Gelombang
             if (titleElement) {
                 const text = titleElement.innerText;
                 titleElement.innerText = ""; 
@@ -200,12 +234,61 @@
 
             if (searchInput && titleElement) {
                 searchInput.addEventListener("input", function() {
+                    // Kontrol Animasi Judul
                     if (this.value.trim().length > 0) {
                         titleElement.classList.add("stop-anim");
                     } else {
                         titleElement.classList.remove("stop-anim");
                     }
                 });
+            }
+
+            // 2. Fitur Autocomplete / Saran Kata
+            if (searchInput && suggestBox) {
+                searchInput.addEventListener('input', function() {
+                    const val = this.value.trim();
+                    if (val.length > 2) {
+                        // Tarik data dari API buatan teman backend-mu
+                        fetch(`/api/autocomplete/?q=${encodeURIComponent(val)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.length > 0) {
+                                suggestBox.innerHTML = ''; 
+                                data.forEach(item => {
+                                    let div = document.createElement('div');
+                                    div.className = 'suggestion-item';
+                                    div.innerHTML = `🔍 ${item}`; 
+                                    
+                                    // Klik saran langsung eksekusi pencarian
+                                    div.onclick = function() {
+                                        searchInput.value = item;
+                                        document.getElementById('mainSearchForm').submit();
+                                    };
+                                    suggestBox.appendChild(div);
+                                });
+                                suggestBox.style.display = 'block'; 
+                                searchBarContainer.style.borderRadius = "25px 25px 0 0"; // Buat ujung bawah kotak rata
+                            } else {
+                                sembunyikanSaran();
+                            }
+                        })
+                        .catch(err => sembunyikanSaran());
+                    } else {
+                        sembunyikanSaran();
+                    }
+                });
+
+                // Hilangkan saran kalau user klik di luar area
+                document.addEventListener('click', function(e) {
+                    if (e.target !== searchInput) {
+                        sembunyikanSaran();
+                    }
+                });
+            }
+
+            function sembunyikanSaran() {
+                if (suggestBox) suggestBox.style.display = 'none';
+                if (searchBarContainer) searchBarContainer.style.borderRadius = "25px"; // Kembalikan bulat sempurna
             }
         });
     </script>

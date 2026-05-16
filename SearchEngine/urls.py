@@ -17,4 +17,7 @@ urlpatterns = [
     
     # 4. JALUR API: Pindah jalur ke /api/ biar gak tabrakan sama halaman utama
     path('api/', include(router.urls)),
+
+    # 5. FITUR AUTOCOMPLETE
+    path('api/autocomplete/', views.autocomplete_api, name='autocomplete'),
 ]
