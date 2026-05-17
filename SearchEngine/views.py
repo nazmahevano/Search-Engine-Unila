@@ -15,8 +15,9 @@ class DokumenViewSet(viewsets.ModelViewSet):
     serializer_class = DokumenSerializer
 
 def index(request):
+    # 🌟 PERBAIKAN UTAMA: Dibungkus dengan list() agar dieksekusi di dalam try-except
     try:
-        top_trends = SearchTrend.objects.values('keyword').annotate(total=Count('keyword')).order_by('-total')[:5]
+        top_trends = list(SearchTrend.objects.values('keyword').annotate(total=Count('keyword')).order_by('-total')[:5])
     except Exception:
         top_trends = []
         
