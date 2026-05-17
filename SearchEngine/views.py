@@ -15,7 +15,11 @@ class DokumenViewSet(viewsets.ModelViewSet):
     serializer_class = DokumenSerializer
 
 def index(request):
-    top_trends = SearchTrend.objects.values('keyword').annotate(total=Count('keyword')).order_by('-total')[:5]
+    try:
+        top_trends = SearchTrend.objects.values('keyword').annotate(total=Count('keyword')).order_by('-total')[:5]
+    except Exception:
+        top_trends = []
+        
     return render(request, 'index.html', {'top_trends': top_trends})
 
 def search_view(request):
@@ -24,7 +28,6 @@ def search_view(request):
     query_text = request.GET.get('q', '').strip()
     page_number = request.GET.get('page', 1)
     
-    # Additional Filters
     source = request.GET.get('sumber', '').strip().lower()
     if not source:
         source = 'semua'
@@ -47,10 +50,16 @@ def search_view(request):
         cached_html = cache.get(cache_key)
         
         if cached_html:
-            SearchTrend.objects.create(keyword=query_text.lower()) 
+            try:
+                SearchTrend.objects.create(keyword=query_text.lower()) 
+            except Exception:
+                pass
             return HttpResponse(cached_html)
 
-        SearchTrend.objects.create(keyword=query_text.lower())
+        try:
+            SearchTrend.objects.create(keyword=query_text.lower())
+        except Exception:
+            pass
         
         if source in ['semua', 'digilib', 'lppm']:
             base_query = SearchQuery(query_text, config='indonesian', search_type='websearch')
@@ -70,10 +79,7 @@ def search_view(request):
             if max_year and max_year.isdigit():
                 base_filters &= Q(year__lte=int(max_year))
 
-            # === 🌟 SAKLAR CERDAS & ANTI-LEMOT ===
             if " " in query_text.strip():
-                # JALUR 1: FRASA (Lebih dari 1 kata). 
-                # HANYA pakai search_vector agar GIN INDEX bekerja 100% ngebut!
                 queryset = DokumenAkademik.objects.filter(
                     base_filters,
                     search_vector=base_query
@@ -91,8 +97,6 @@ def search_view(request):
                 ).order_by('-total_rank', '-year')
                 
             else:
-                # JALUR 2: TYPO (1 Kata Saja).
-                # Pencarian dipersempit dulu pakai search_vector agar database tidak meledak.
                 queryset = DokumenAkademik.objects.filter(
                     base_filters,
                     search_vector=base_query
