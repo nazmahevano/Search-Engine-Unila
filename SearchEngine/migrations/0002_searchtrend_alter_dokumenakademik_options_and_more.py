@@ -24,14 +24,14 @@ class Migration(migrations.Migration):
             name='dokumenakademik',
             options={'managed': True},
         ),
-        migrations.RemoveField(
-            model_name='dokumenakademik',
-            name='diambil_pada',
-        ),
-        migrations.RemoveField(
-            model_name='dokumenakademik',
-            name='url_asli',
-        ),
+        #migrations.RemoveField(
+        #   model_name='dokumenakademik',
+        #  name='diambil_pada',
+        #),
+        #migrations.RemoveField(
+        #   model_name='dokumenakademik',
+        #  name='url_asli',
+        #),
         migrations.AddField(
             model_name='dokumenakademik',
             name='division',
