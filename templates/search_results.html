@@ -52,6 +52,17 @@
         
         .teks-jumlah-hasil { color: #70757a; font-size: 0.95rem; margin-bottom: 25px; }
 
+        /* === CSS AUTOCOMPLETE === */
+        .search-input-box { position: relative; } /* Pastikan ada ini */
+        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background-color: #ffffff; border: 1px solid #dfe1e5; border-top: none; border-radius: 0 0 24px 24px; box-shadow: 0 4px 6px rgba(32,33,36,.28); z-index: 99; overflow: hidden; text-align: left; margin-top: 1px; }
+        .suggestion-item { padding: 10px 20px; cursor: pointer; color: #202124; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 10px; }
+        .suggestion-item:hover { background-color: #f1f3f4; }
+        
+        body.dark-mode .autocomplete-suggestions { background-color: #303134; border-color: #5f6368; box-shadow: 0 4px 6px rgba(0,0,0,.3); }
+        body.dark-mode .suggestion-item { color: #e8eaed; }
+        body.dark-mode .suggestion-item:hover { background-color: #3c4043; }
+        /* ======================== */
+        
         /* Dark Mode */
         body.dark-mode { background-color: #202124; color: #e8eaed; }
         body.dark-mode .top-nav { border-bottom: 1px solid #3c4043; background: #202124; }
@@ -142,8 +153,10 @@
 
         <div class="search-area">
             <div class="search-input-box">
-                <input type="text" name="q" value="{{ query }}" placeholder="Cari skripsi atau jurnal...">
+                <input type="text" id="search-input" name="q" value="{{ query }}" autocomplete="off" placeholder="Cari skripsi atau jurnal...">
                 <button type="submit">🔍</button>
+                
+                <div id="autocomplete-list" class="autocomplete-suggestions" style="display: none;"></div>
             </div>
         </div>
     </form>
@@ -153,12 +166,12 @@
         {% if query %}
             <div class="teks-jumlah-hasil">
                 {% if sumber == 'semua' %}
-                    Berhasil menemukan <strong>{{ total_hasil }}</strong> dokumen 
+                    Berhasil menemukan <strong>{{ total_hasil }}</strong> dokumen dalam <strong>{{ waktu_eksekusi }} detik</strong>
                     (<strong>{{ total_digilib }}</strong> dari Digilib Skripsi, <strong>{{ total_lppm }}</strong> dari LPPM Unila)
                 {% elif sumber == 'digilib' %}
-                    Berhasil menemukan <strong>{{ total_digilib }}</strong> dokumen dari Digilib Skripsi
+                    Berhasil menemukan <strong>{{ total_digilib }}</strong> dokumen dari Digilib Skripsi dalam <strong>{{ waktu_eksekusi }} detik</strong>
                 {% elif sumber == 'lppm' %}
-                    Berhasil menemukan <strong>{{ total_lppm }}</strong> dokumen dari LPPM Unila
+                    Berhasil menemukan <strong>{{ total_lppm }}</strong> dokumen dari LPPM Unila dalam <strong>{{ waktu_eksekusi }} detik</strong>
                 {% endif %}
             </div>
         {% endif %}
@@ -286,6 +299,54 @@
         document.addEventListener("DOMContentLoaded", function() {
             applyHighlightAndSnippet('#local-results-container');
         });
+
+        // ================= FITUR SARAN KATA (AUTOCOMPLETE) =================
+        const searchInput = document.getElementById('search-input');
+        const suggestBox = document.getElementById('autocomplete-list');
+        const searchBarContainer = document.querySelector('.search-input-box');
+
+        if (searchInput && suggestBox) {
+            searchInput.addEventListener('input', function() {
+                const val = this.value.trim();
+                if (val.length > 2) {
+                    fetch(`/api/autocomplete/?q=${encodeURIComponent(val)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.length > 0) {
+                            suggestBox.innerHTML = ''; 
+                            data.forEach(item => {
+                                let div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.innerHTML = `🔍 ${item}`; 
+                                div.onclick = function() {
+                                    searchInput.value = item;
+                                    document.getElementById('searchForm').submit();
+                                };
+                                suggestBox.appendChild(div);
+                            });
+                            suggestBox.style.display = 'block'; 
+                            if(searchBarContainer) searchBarContainer.style.borderRadius = "24px 24px 0 0";
+                        } else {
+                            sembunyikanSaran();
+                        }
+                    })
+                    .catch(err => sembunyikanSaran());
+                } else {
+                    sembunyikanSaran();
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target !== searchInput) {
+                    sembunyikanSaran();
+                }
+            });
+        }
+
+        function sembunyikanSaran() {
+            if (suggestBox) suggestBox.style.display = 'none';
+            if (searchBarContainer) searchBarContainer.style.borderRadius = "24px";
+        }
     </script>
 </body>
 </html>
