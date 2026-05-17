@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.search import SearchVector, SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
 from django.db.models import Value
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_save, post_delete
@@ -26,6 +27,9 @@ class DokumenAkademik(models.Model):
     class Meta:
         managed = True
         db_table = 'SearchEngine_dokumenakademik'
+        indexes = [
+            GinIndex(fields=['search_vector']),
+        ]
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

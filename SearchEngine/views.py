@@ -40,20 +40,16 @@ def search_view(request):
     execution_time = "0"
 
     if query_text:
-        # Check cache version
         cache_version = cache.get('search_cache_version', 1)
-        
-        # Unique cache key
-        cache_key = f"search_{query_text}_{source}_{faculty}_{min_year}_{max_year}_{page_number}_v{cache_version}"
+        safe_query = query_text.replace(" ", "_")
+        cache_key = f"search_{safe_query}_{source}_{faculty}_{min_year}_{max_year}_{page_number}_v{cache_version}"
         
         cached_html = cache.get(cache_key)
         
         if cached_html:
-            # CACHE HIT: Serve directly from RAM
             SearchTrend.objects.create(keyword=query_text.lower()) 
             return HttpResponse(cached_html)
 
-        # CACHE MISS: Hit PostgreSQL Database
         SearchTrend.objects.create(keyword=query_text.lower())
         
         if source in ['semua', 'digilib', 'lppm']:
@@ -74,31 +70,48 @@ def search_view(request):
             if max_year and max_year.isdigit():
                 base_filters &= Q(year__lte=int(max_year))
 
-            # Unified Enterprise Query: Filter, Annotate, and Rank in ONE go!
-            queryset = DokumenAkademik.objects.filter(base_filters).annotate(
-                sim_title=TrigramSimilarity(Lower('title'), query_text.lower()),
-                sim_author=TrigramSimilarity(Lower('author'), query_text.lower()),
-                rank_base=SearchRank('search_vector', base_query),
-                rank_phrase=SearchRank('search_vector', phrase_query) * 10.0,
-                exact_score=Case(
-                    When(title__icontains=query_text, then=Value(1000.0)),
-                    When(author__icontains=query_text, then=Value(500.0)),
-                    default=Value(0.0),
-                    output_field=FloatField(),
-                )
-            ).filter(
-                Q(search_vector=base_query) |
-                Q(sim_title__gt=0.3) |
-                Q(sim_author__gt=0.3) |
-                Q(title__icontains=query_text) |
-                Q(author__icontains=query_text)
-            ).annotate(
-                total_rank=(F('exact_score') + F('rank_base') + F('rank_phrase') + F('sim_title') + F('sim_author'))
-            ).order_by('-total_rank', '-year')
+            # === 🌟 SAKLAR CERDAS & ANTI-LEMOT ===
+            if " " in query_text.strip():
+                # JALUR 1: FRASA (Lebih dari 1 kata). 
+                # HANYA pakai search_vector agar GIN INDEX bekerja 100% ngebut!
+                queryset = DokumenAkademik.objects.filter(
+                    base_filters,
+                    search_vector=base_query
+                ).annotate(
+                    rank_base=SearchRank('search_vector', base_query),
+                    rank_phrase=SearchRank('search_vector', phrase_query) * 10.0,
+                    exact_score=Case(
+                        When(title__icontains=query_text, then=Value(1000.0)),
+                        When(author__icontains=query_text, then=Value(500.0)),
+                        default=Value(0.0),
+                        output_field=FloatField(),
+                    )
+                ).annotate(
+                    total_rank=(F('exact_score') + F('rank_base') + F('rank_phrase'))
+                ).order_by('-total_rank', '-year')
+                
+            else:
+                # JALUR 2: TYPO (1 Kata Saja).
+                # Pencarian dipersempit dulu pakai search_vector agar database tidak meledak.
+                queryset = DokumenAkademik.objects.filter(
+                    base_filters,
+                    search_vector=base_query
+                ).annotate(
+                    sim_title=TrigramSimilarity(Lower('title'), query_text.lower()),
+                    sim_author=TrigramSimilarity(Lower('author'), query_text.lower()),
+                    rank_base=SearchRank('search_vector', base_query),
+                    exact_score=Case(
+                        When(title__icontains=query_text, then=Value(1000.0)),
+                        When(author__icontains=query_text, then=Value(500.0)),
+                        default=Value(0.0),
+                        output_field=FloatField(),
+                    )
+                ).annotate(
+                    total_rank=(F('exact_score') + F('rank_base') + F('sim_title') + F('sim_author'))
+                ).order_by('-total_rank', '-year')
 
             total_found = queryset.count()
             
-            # Count precise numbers per database efficiently
             if total_found > 0:
                 if source == 'semua':
                     total_digilib = queryset.filter(source='DIGILIB').count()
@@ -130,7 +143,6 @@ def search_view(request):
     template_name = 'lppm_results.html' if source == 'lppm' else 'search_results.html'
     response = render(request, template_name, context)
     
-    # Save to RAM after rendering
     if query_text:
         cache.set(cache_key, response.content, timeout=2592000)
 
@@ -140,7 +152,6 @@ def detail_view(request, id):
     thesis = get_object_or_404(DokumenAkademik, id=id)
     return render(request, 'detail.html', {'skripsi': thesis})
 
-# Autocomplete API Endpoint (Rifdah's Feature)
 def autocomplete_api(request):
     query = request.GET.get('q', '').strip()
     if len(query) > 2:
