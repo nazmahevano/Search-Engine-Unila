@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.db.models import Value
 from django.db.models.functions import Coalesce
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.core.cache import cache
 
 class DokumenAkademik(models.Model):
     identifier = models.CharField(max_length=255, unique=True)
@@ -25,14 +28,26 @@ class DokumenAkademik(models.Model):
         db_table = 'SearchEngine_dokumenakademik'
     
     def save(self, *args, **kwargs):
-        # 1. Simpan data ke database
         super().save(*args, **kwargs)
         
-        # 2. Setelah tersimpan dan mendapatkan ID, langsung perbarui bobot pencariannya khusus untuk data ini
+        # Update pembobotan setelah menyimpan dokumen
         vector = (
             SearchVector(Coalesce('title', Value('', output_field=models.TextField()), output_field=models.TextField()), weight='A', config='indonesian') +
             SearchVector(Coalesce('author', Value('', output_field=models.TextField()), output_field=models.TextField()), weight='B', config='indonesian') +
             SearchVector(Coalesce('abstract', Value('', output_field=models.TextField()), output_field=models.TextField()), weight='C', config='indonesian')
         )
-        # Update langsung ke ID dokumen yang baru saja disave
         DokumenAkademik.objects.filter(pk=self.pk).update(search_vector=vector)
+
+# Model untuk menyimpan tren pencarian
+class SearchTrend(models.Model):
+    keyword = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.keyword
+    
+# Sinyal untuk mengupdate versi cache setiap kali ada perubahan data pada DokumenAkademik
+@receiver([post_save, post_delete], sender=DokumenAkademik)
+def increment_cache_version(sender, **kwargs):
+    current_version = cache.get('search_cache_version', 1)
+    cache.set('search_cache_version', current_version + 1, timeout=None)

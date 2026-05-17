@@ -1,10 +1,12 @@
+import time
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
-from django.db.models import F, Q
+from django.db.models import F, Q, Case, When, Value, FloatField, Count
 from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
-from django.http import JsonResponse
-from .models import DokumenAkademik
+from django.core.cache import cache
+from .models import DokumenAkademik, SearchTrend
 from rest_framework import viewsets
 from .serializers import DokumenSerializer
 
@@ -13,106 +15,135 @@ class DokumenViewSet(viewsets.ModelViewSet):
     serializer_class = DokumenSerializer
 
 def index(request):
-    return render(request, 'index.html')
+    top_trends = SearchTrend.objects.values('keyword').annotate(total=Count('keyword')).order_by('-total')[:5]
+    return render(request, 'index.html', {'top_trends': top_trends})
 
 def search_view(request):
+    start_time = time.time()
+
     query_text = request.GET.get('q', '').strip()
     page_number = request.GET.get('page', 1)
     
-    # Filter Tambahan
-    sumber = request.GET.get('sumber', '').strip().lower()
-    if not sumber:
-        sumber = 'semua'
+    # Additional Filters
+    source = request.GET.get('sumber', '').strip().lower()
+    if not source:
+        source = 'semua'
         
-    tahun_min = request.GET.get('tahun_min', '')
-    tahun_max = request.GET.get('tahun_max', '')
-    fakultas = request.GET.get('fakultas', '') 
+    min_year = request.GET.get('tahun_min', '')
+    max_year = request.GET.get('tahun_max', '')
+    faculty = request.GET.get('fakultas', '') 
 
-    results_lokal = None
+    local_results = None
     total_found = 0
     total_digilib = 0
     total_lppm = 0
+    execution_time = "0"
 
     if query_text:
-        if sumber in ['semua', 'digilib', 'lppm']:
-            query = SearchQuery(query_text, config='indonesian')
-            base_filters = Q()
+        # Check cache version
+        cache_version = cache.get('search_cache_version', 1)
+        
+        # Unique cache key
+        cache_key = f"search_{query_text}_{source}_{faculty}_{min_year}_{max_year}_{page_number}_v{cache_version}"
+        
+        cached_html = cache.get(cache_key)
+        
+        if cached_html:
+            # CACHE HIT: Serve directly from RAM
+            SearchTrend.objects.create(keyword=query_text.lower()) 
+            return HttpResponse(cached_html)
+
+        # CACHE MISS: Hit PostgreSQL Database
+        SearchTrend.objects.create(keyword=query_text.lower())
+        
+        if source in ['semua', 'digilib', 'lppm']:
+            base_query = SearchQuery(query_text, config='indonesian', search_type='websearch')
+            phrase_query = SearchQuery(query_text, config='indonesian', search_type='phrase')
             
-            if sumber == 'digilib':
+            base_filters = Q()
+            if source == 'digilib':
                 base_filters &= Q(source='DIGILIB')
-            elif sumber == 'lppm':
+            elif source == 'lppm':
                 base_filters &= Q(source='LPPM')
                 
-            if fakultas:
-                base_filters &= Q(division__icontains=fakultas)
+            if faculty:
+                base_filters &= Q(division__icontains=faculty)
             
-            if tahun_min and tahun_min.isdigit():
-                base_filters &= Q(year__gte=int(tahun_min))
-            if tahun_max and tahun_max.isdigit():
-                base_filters &= Q(year__lte=int(tahun_max))
+            if min_year and min_year.isdigit():
+                base_filters &= Q(year__gte=int(min_year))
+            if max_year and max_year.isdigit():
+                base_filters &= Q(year__lte=int(max_year))
 
-            # FTS & Fuzzy Search
-            fts_base = DokumenAkademik.objects.filter(
-                base_filters & (
-                    Q(search_vector=query) | 
-                    Q(author__icontains=query_text) | 
-                    Q(title__icontains=query_text)
-                )
-            )
-            fts_ids = list(fts_base.values_list('id', flat=True)[:3000])
-            
-            fuzzy_base = DokumenAkademik.objects.annotate(
+            # Unified Enterprise Query: Filter, Annotate, and Rank in ONE go!
+            queryset = DokumenAkademik.objects.filter(base_filters).annotate(
                 sim_title=TrigramSimilarity(Lower('title'), query_text.lower()),
-                sim_author=TrigramSimilarity(Lower('author'), query_text.lower())
+                sim_author=TrigramSimilarity(Lower('author'), query_text.lower()),
+                rank_base=SearchRank('search_vector', base_query),
+                rank_phrase=SearchRank('search_vector', phrase_query) * 10.0,
+                exact_score=Case(
+                    When(title__icontains=query_text, then=Value(1000.0)),
+                    When(author__icontains=query_text, then=Value(500.0)),
+                    default=Value(0.0),
+                    output_field=FloatField(),
+                )
             ).filter(
-                base_filters, 
-                Q(sim_title__gt=0.2) | Q(sim_author__gt=0.2) 
-            )
-            
-            fuzzy_ids = list(
-                fuzzy_base.annotate(total_sim=F('sim_title') + F('sim_author'))
-                          .order_by('-total_sim')
-                          .values_list('id', flat=True)[:1000]
-            )
-
-            all_ids = list(set(fts_ids + fuzzy_ids))
-            total_found = len(all_ids)
-            
-            # --- MENGHITUNG ANGKA PASTI PER DATABASE ---
-            if total_found > 0:
-                total_digilib = DokumenAkademik.objects.filter(id__in=all_ids, source='DIGILIB').count()
-                total_lppm = DokumenAkademik.objects.filter(id__in=all_ids, source='LPPM').count()
-
-            queryset = DokumenAkademik.objects.filter(id__in=all_ids).annotate(
-                rank=SearchRank('search_vector', query, weights=[0.05, 0.1, 0.1, 1.0], normalization=2),
-                similarity=TrigramSimilarity(Lower('title'), query_text.lower())
+                Q(search_vector=base_query) |
+                Q(sim_title__gt=0.3) |
+                Q(sim_author__gt=0.3) |
+                Q(title__icontains=query_text) |
+                Q(author__icontains=query_text)
             ).annotate(
-                total_rank=(F('rank') + F('similarity'))
+                total_rank=(F('exact_score') + F('rank_base') + F('rank_phrase') + F('sim_title') + F('sim_author'))
             ).order_by('-total_rank', '-year')
+
+            total_found = queryset.count()
             
+            # Count precise numbers per database efficiently
+            if total_found > 0:
+                if source == 'semua':
+                    total_digilib = queryset.filter(source='DIGILIB').count()
+                    total_lppm = queryset.filter(source='LPPM').count()
+                elif source == 'digilib':
+                    total_digilib = total_found
+                elif source == 'lppm':
+                    total_lppm = total_found
+
             paginator = Paginator(queryset, 10)
-            results_lokal = paginator.get_page(page_number)
+            local_results = paginator.get_page(page_number)
+
+    end_time = time.time()
+    execution_time = str(round(end_time - start_time, 3)).replace('.', ',')
 
     context = {
-        'page_obj': results_lokal,
+        'page_obj': local_results,
         'query': query_text,
         'total_hasil': total_found,
         'total_digilib': total_digilib,
         'total_lppm': total_lppm,
-        'sumber': sumber,
-        'tahun_min': tahun_min,
-        'tahun_max': tahun_max,
-        'fakultas': fakultas,
+        'sumber': source,
+        'tahun_min': min_year,
+        'tahun_max': max_year,
+        'fakultas': faculty,
+        'waktu_eksekusi': execution_time,
     }
     
-    # Jalur Template (Semantic Dihapus)
-    if sumber == 'lppm':
-        template = 'lppm_results.html'
-    else:
-        template = 'search_results.html'
-        
-    return render(request, template, context)
+    template_name = 'lppm_results.html' if source == 'lppm' else 'search_results.html'
+    response = render(request, template_name, context)
+    
+    # Save to RAM after rendering
+    if query_text:
+        cache.set(cache_key, response.content, timeout=2592000)
+
+    return response
 
 def detail_view(request, id):
-    skripsi = get_object_or_404(DokumenAkademik, id=id)
-    return render(request, 'detail.html', {'skripsi': skripsi})
+    thesis = get_object_or_404(DokumenAkademik, id=id)
+    return render(request, 'detail.html', {'skripsi': thesis})
+
+# Autocomplete API Endpoint (Rifdah's Feature)
+def autocomplete_api(request):
+    query = request.GET.get('q', '').strip()
+    if len(query) > 2:
+        suggestions = DokumenAkademik.objects.filter(title__icontains=query).values_list('title', flat=True)[:5]
+        return JsonResponse(list(suggestions), safe=False)
+    return JsonResponse([], safe=False)
