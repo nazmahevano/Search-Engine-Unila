@@ -12,10 +12,8 @@
         
         /* Layout Utama */
         header { padding: 20px 40px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #ebebeb; }
-        .logo-nav { width: 40px; }
+        .logo-nav { width: 40px; height: auto; }
         .main-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 80%; max-width: 600px; margin: 0 auto; text-align: center; }
-        
-        /* Perbaikan kontras warna footer dari #777 menjadi #5f6368 */
         footer { padding: 20px; text-align: center; color: #5f6368; font-size: 0.8rem; border-top: 1px solid #ebebeb; background: #f8f9fa; }
 
         /* Loading */
@@ -23,7 +21,7 @@
         .spinner-ring-only { width: 80px; height: 80px; border: 8px solid #f3f3f3; border-top: 8px solid #1a73e8; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Elemen Aslimu */
+        /* Elemen Utama */
         h1 { font-size: 2.5rem; font-weight: bold; margin-bottom: 2rem; color: blue; }
         form { width: 100%; display: flex; justify-content: center; }
         .search-bar { background: white; border-radius: 25px; border: 1px solid #ccc; width: 100%; max-width: 500px; padding: 5px 15px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; }
@@ -32,8 +30,11 @@
         .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background-color: #ffffff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 25px 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 99; overflow: hidden; text-align: left; margin-top: 1px; }
         .suggestion-item { padding: 10px 20px; cursor: pointer; color: #333; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 10px; }
         .suggestion-item:hover { background-color: #f1f3f4; }
+        
         .services-container { margin-top: 3rem; display: flex; justify-content: center; gap: 2rem; }
-        .service-tile { background: white; border-radius: 12px; padding: 12px; text-align: center; width: 110px; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #333; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        
+        /* Perbaikan: Menyesuaikan gaya agar tag button tidak terlihat default (kotak abu-abu) */
+        .service-tile { background: white; border: none; cursor: pointer; font-family: inherit; border-radius: 12px; padding: 12px; text-align: center; width: 110px; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #333; transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .service-tile:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
         .icon-container { width: 75px; height: 75px; display: flex; justify-content: center; align-items: center; margin-bottom: 5px; position: relative; }
         .service-tile p { margin: 0; font-size: 0.95rem; line-height: 1.2; }
@@ -42,25 +43,13 @@
         .waving-text span { display: inline-block; animation: waveBounce 1.5s infinite; }
         .waving-text.stop-anim span { animation: none !important; transform: translateY(0) !important; }
         
-        .stats-container {
-        display: flex;
-        justify-content: center;
-        gap: 30px;
-        margin-top: 20px;
-        color: #5f6368;
-        font-size: 0.9rem;
-        }
-
-        .stat-value {
-        font-weight: bold;
-        color: #1a73e8;
-        margin-left: 5px;
-        }
+        .stats-container { display: flex; justify-content: center; gap: 30px; margin-top: 20px; color: #5f6368; font-size: 0.9rem; }
+        .stat-value { font-weight: bold; color: #1a73e8; margin-left: 5px; }
     </style>
 </head>
 <body>
     <header>
-        <img src="{% static 'image/logo-unila.png' %}" class="logo-nav" alt="Logo Universitas Lampung">
+        <img src="{% static 'image/logo-unila.png' %}" class="logo-nav" width="40" height="40" alt="Logo Universitas Lampung" fetchpriority="high">
         <span style="font-weight: bold; color: blue;">Portal Pencarian Karya Ilmiah Universitas Lampung</span>
     </header>
 
@@ -69,7 +58,7 @@
     <main class="main-container">
         <h1 id="animated-title">Mulai Pencarian</h1>
         
-        <form action="/search/" method="GET" id="mainSearchForm">
+        <form action="/search/" method="GET" id="mainSearchForm" role="search">
             <div class="search-bar" id="search-bar-container">
                 <span class="search-icon" aria-hidden="true">🔍</span>
                 <input type="text" id="search-input" class="search-input" name="q" autocomplete="off" placeholder="Masukkan kata kunci pencarian..." aria-label="Kolom pencarian karya ilmiah">
@@ -93,14 +82,14 @@
         </div>
 
         <div class="services-container">
-            <a href="javascript:void(0)" onclick="cariDenganSumber('digilib')" class="service-tile" style="text-decoration: none;">
-                <div class="icon-container"><img src="{% static 'image/logo-unila.png' %}" style="width: 50px;" alt="Ikon Database Digilib"></div>
+            <button type="button" onclick="cariDenganSumber('digilib')" class="service-tile">
+                <div class="icon-container"><img src="{% static 'image/logo-unila.png' %}" style="width: 50px; height: auto;" width="50" height="50" alt="Ikon Database Digilib" loading="lazy"></div>
                 <p>Digilib</p>
-            </a>
-            <a href="javascript:void(0)" onclick="cariDenganSumber('lppm')" class="service-tile" style="text-decoration: none;">
-                <div class="icon-container"><img src="{% static 'image/LPPM-UNILA-LOGGO.png' %}" style="width: 50px;" alt="Ikon Database LPPM Unila"></div>
+            </button>
+            <button type="button" onclick="cariDenganSumber('lppm')" class="service-tile">
+                <div class="icon-container"><img src="{% static 'image/LPPM-UNILA-LOGGO.png' %}" style="width: 50px; height: auto;" width="50" height="50" alt="Ikon Database LPPM Unila" loading="lazy"></div>
                 <p>LPPM Unila</p>
-            </a>
+            </button>
         </div>
     </main>
 
