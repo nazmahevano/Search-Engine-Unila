@@ -7,221 +7,108 @@
     <title>Search Engine Skripsi</title>
     <link rel="icon" href="{% static 'image/logo-unila.png' %}" type="image/png">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: white;
-            color: blue; 
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; background: white; color: blue; }
+        
+        /* Layout Utama */
+        header { padding: 20px 40px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #ebebeb; }
+        .logo-nav { width: 40px; }
+        .main-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 80%; max-width: 600px; margin: 0 auto; text-align: center; }
+        footer { padding: 20px; text-align: center; color: #777; font-size: 0.8rem; border-top: 1px solid #ebebeb; background: #f8f9fa; }
 
-        .main-container {
-            text-align: center;
-            width: 80%;
-            max-width: 600px;
-        }
+        /* Loading */
+        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 2000; justify-content: center; align-items: center; }
+        .spinner-ring-only { width: 80px; height: 80px; border: 8px solid #f3f3f3; border-top: 8px solid #1a73e8; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 2rem;
-            color: blue; 
-        }
-
-        form {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        .search-bar {
-            background: white;
-            border-radius: 25px; 
-            border: 1px solid #ccc;
-            width: 100%;
-            max-width: 500px;
-            padding: 5px 15px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative; /* PENTING UNTUK AUTOCOMPLETE */
-        }
-
-        .search-icon {
-            font-size: 1.2rem;
-            color: #777;
-            padding-right: 15px;
-            border-right: 1px solid #ccc;
-            margin-right: 15px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .search-input {
-            flex: 1;
-            border: none !important;
-            outline: none !important;
-            padding: 10px;
-            font-size: 1.1rem;
-            background: transparent;
-            box-shadow: none !important;
-            width: 100%; 
-            color: #333; 
-        }
-
-        /* === CSS AUTOCOMPLETE SARAN KATA === */
-        .autocomplete-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            border-top: none;
-            border-radius: 0 0 25px 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            z-index: 99;
-            overflow: hidden;
-            text-align: left;
-            margin-top: 1px;
-        }
-        .suggestion-item { 
-            padding: 10px 20px; 
-            cursor: pointer; 
-            color: #333; 
-            font-size: 1rem; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
+        /* Elemen Aslimu */
+        h1 { font-size: 2.5rem; font-weight: bold; margin-bottom: 2rem; color: blue; }
+        form { width: 100%; display: flex; justify-content: center; }
+        .search-bar { background: white; border-radius: 25px; border: 1px solid #ccc; width: 100%; max-width: 500px; padding: 5px 15px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; }
+        .search-icon { font-size: 1.2rem; color: #777; padding-right: 15px; border-right: 1px solid #ccc; margin-right: 15px; height: 25px; display: flex; align-items: center; justify-content: center; }
+        .search-input { flex: 1; border: none !important; outline: none !important; padding: 10px; font-size: 1.1rem; background: transparent; box-shadow: none !important; width: 100%; color: #333; }
+        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background-color: #ffffff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 25px 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 99; overflow: hidden; text-align: left; margin-top: 1px; }
+        .suggestion-item { padding: 10px 20px; cursor: pointer; color: #333; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 10px; }
         .suggestion-item:hover { background-color: #f1f3f4; }
-        /* =================================== */
-
-        .services-container {
-            margin-top: 3rem;
-            display: flex;
-            justify-content: center;
-            gap: 2rem; 
+        .services-container { margin-top: 3rem; display: flex; justify-content: center; gap: 2rem; }
+        .service-tile { background: white; border-radius: 12px; padding: 12px; text-align: center; width: 110px; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #333; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .service-tile:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .icon-container { width: 75px; height: 75px; display: flex; justify-content: center; align-items: center; margin-bottom: 5px; position: relative; }
+        .service-tile p { margin: 0; font-size: 0.95rem; line-height: 1.2; }
+        
+        @keyframes waveBounce { 0%, 40%, 100% { transform: translateY(0); } 20% { transform: translateY(-15px); } }
+        .waving-text span { display: inline-block; animation: waveBounce 1.5s infinite; }
+        .waving-text.stop-anim span { animation: none !important; transform: translateY(0) !important; }
+        
+        .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 20px;
+        color: #5f6368;
+        font-size: 0.9rem;
         }
 
-        .service-tile {
-            background: white;
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            width: 110px; 
-            height: 110px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none; 
-            color: #333; 
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        .stat-value {
+        font-weight: bold;
+        color: #1a73e8;
+        margin-left: 5px;
         }
-
-        .service-tile:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        .icon-container {
-            width: 75px;
-            height: 75px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 5px;
-            position: relative;
-        }
-
-        .service-tile p {
-            margin: 0;
-            font-size: 0.95rem;
-            line-height: 1.2;
-        }
-
-        /* === ANIMASI GELOMBANG HURUF === */
-        @keyframes waveBounce {
-            0%, 40%, 100% { transform: translateY(0); }
-            20% { transform: translateY(-15px); } 
-        }
-
-        .waving-text span {
-            display: inline-block;
-            animation: waveBounce 1.5s infinite; 
-        }
-
-        .waving-text.stop-anim span {
-            animation: none !important;
-            transform: translateY(0) !important;
-        }
-
     </style>
 </head>
 <body>
+    <header>
+        <img src="{% static 'image/logo-unila.png' %}" class="logo-nav" alt="Logo">
+        <span style="font-weight: bold; color: blue;">Portal Pencarian Karya Ilmiah Universitas Lampung</span>
+    </header>
+
+    <div id="loading-overlay"><div class="spinner-ring-only"></div></div>
+
     <div class="main-container">
-        <h1 id="animated-title" style="color: blue; text-align: center;">Mulai Pencarian</h1>
+        <h1 id="animated-title">Mulai Pencarian</h1>
         
         <form action="/search/" method="GET" id="mainSearchForm">
             <div class="search-bar" id="search-bar-container">
                 <span class="search-icon">🔍</span>
                 <input type="text" id="search-input" class="search-input" name="q" autocomplete="off" placeholder="Masukkan kata kunci pencarian...">
-                
                 <div id="autocomplete-list" class="autocomplete-suggestions" style="display: none;"></div>
             </div>
         </form>
 
-        {% if top_trends %}
-        <div class="trending-searches" style="margin-top: 15px; text-align: center;">
-            <span style="font-size: 14px; color: #666;">Sedang Tren: </span>
-            {% for trend in top_trends %}
-                <a href="/search/?q={{ trend.keyword|urlencode }}" 
-                style="display: inline-block; background-color: #f1f3f4; color: #3c4043; padding: 5px 12px; border-radius: 16px; margin: 3px; font-size: 13px; text-decoration: none; border: 1px solid #dfe1e5;">
-                    🔍 {{ trend.keyword }}
-                </a>
-            {% endfor %}
+        <p style="margin-top: 20px; color: #5f6368; font-size: 0.9rem;">
+            Akses ribuan dokumen skripsi dan penelitian dosen dari Digilib dan LPPM Universitas Lampung
+        </p>
+
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-label">Digilib:</span>
+                <span class="stat-value">{{ jumlah_digilib }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">LPPM:</span>
+                <span class="stat-value">{{ jumlah_lppm }}</span>
+            </div>
         </div>
-        {% endif %}
-        
+
         <div class="services-container">
             <a href="javascript:void(0)" onclick="cariDenganSumber('digilib')" class="service-tile" style="text-decoration: none;">
-                <div class="icon-container">
-                    <img src="{% static 'image/logo-unila.png' %}" alt="Digilib" style="width: 50px;">
-                </div>
+                <div class="icon-container"><img src="{% static 'image/logo-unila.png' %}" style="width: 50px;"></div>
                 <p>Digilib</p>
             </a>
-
             <a href="javascript:void(0)" onclick="cariDenganSumber('lppm')" class="service-tile" style="text-decoration: none;">
-                <div class="icon-container">
-                    <img src="{% static 'image/LPPM-UNILA-LOGGO.png' %}" alt="LPPM" style="width: 50px;">
-                </div>
+                <div class="icon-container"><img src="{% static 'image/LPPM-UNILA-LOGGO.png' %}" style="width: 50px;"></div>
                 <p>LPPM Unila</p>
             </a>
         </div>
     </div>
-</body>
 
-<script>
-        // Fungsi baru untuk menangani klik tombol database di halaman awal
+    <footer>&copy; Tim Pengembang, 2026. Semua hak dilindungi.</footer>
+
+    <script>
+        document.getElementById('mainSearchForm').addEventListener('submit', function() { document.getElementById('loading-overlay').style.display = 'flex'; });
         function cariDenganSumber(sumber) {
+            document.getElementById('loading-overlay').style.display = 'flex';
             var kataKunci = document.querySelector('.search-input').value;
-            
-            // Arahkan ke halaman search milik kita sendiri dengan membawa parameter sumber
-            if (kataKunci.trim() === "") {
-                window.location.href = "/search/?sumber=" + sumber;
-            } else {
-                window.location.href = "/search/?q=" + encodeURIComponent(kataKunci) + "&sumber=" + sumber;
-            }
+            window.location.href = "/search/?q=" + encodeURIComponent(kataKunci) + "&sumber=" + sumber;
         }
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -230,12 +117,9 @@
             const suggestBox = document.getElementById('autocomplete-list');
             const searchBarContainer = document.getElementById('search-bar-container');
 
-            // 1. Animasi Gelombang
             if (titleElement) {
                 const text = titleElement.innerText;
-                titleElement.innerText = ""; 
-                titleElement.classList.add("waving-text");
-
+                titleElement.innerText = ""; titleElement.classList.add("waving-text");
                 for (let i = 0; i < text.length; i++) {
                     let span = document.createElement("span");
                     span.innerText = text[i] === " " ? "\u00A0" : text[i]; 
@@ -246,21 +130,15 @@
 
             if (searchInput && titleElement) {
                 searchInput.addEventListener("input", function() {
-                    // Kontrol Animasi Judul
-                    if (this.value.trim().length > 0) {
-                        titleElement.classList.add("stop-anim");
-                    } else {
-                        titleElement.classList.remove("stop-anim");
-                    }
+                    if (this.value.trim().length > 0) titleElement.classList.add("stop-anim");
+                    else titleElement.classList.remove("stop-anim");
                 });
             }
 
-            // 2. Fitur Autocomplete / Saran Kata
             if (searchInput && suggestBox) {
                 searchInput.addEventListener('input', function() {
                     const val = this.value.trim();
                     if (val.length > 2) {
-                        // Tarik data dari API buatan teman backend-mu
                         fetch(`/api/autocomplete/?q=${encodeURIComponent(val)}`)
                         .then(res => res.json())
                         .then(data => {
@@ -270,38 +148,18 @@
                                     let div = document.createElement('div');
                                     div.className = 'suggestion-item';
                                     div.innerHTML = `🔍 ${item}`; 
-                                    
-                                    // Klik saran langsung eksekusi pencarian
-                                    div.onclick = function() {
-                                        searchInput.value = item;
-                                        document.getElementById('mainSearchForm').submit();
-                                    };
+                                    div.onclick = function() { searchInput.value = item; document.getElementById('mainSearchForm').submit(); };
                                     suggestBox.appendChild(div);
                                 });
-                                suggestBox.style.display = 'block'; 
-                                searchBarContainer.style.borderRadius = "25px 25px 0 0"; // Buat ujung bawah kotak rata
-                            } else {
-                                sembunyikanSaran();
-                            }
-                        })
-                        .catch(err => sembunyikanSaran());
-                    } else {
-                        sembunyikanSaran();
-                    }
+                                suggestBox.style.display = 'block'; searchBarContainer.style.borderRadius = "25px 25px 0 0";
+                            } else { sembunyikanSaran(); }
+                        }).catch(err => sembunyikanSaran());
+                    } else { sembunyikanSaran(); }
                 });
-
-                // Hilangkan saran kalau user klik di luar area
-                document.addEventListener('click', function(e) {
-                    if (e.target !== searchInput) {
-                        sembunyikanSaran();
-                    }
-                });
+                document.addEventListener('click', function(e) { if (e.target !== searchInput) sembunyikanSaran(); });
             }
-
-            function sembunyikanSaran() {
-                if (suggestBox) suggestBox.style.display = 'none';
-                if (searchBarContainer) searchBarContainer.style.borderRadius = "25px"; // Kembalikan bulat sempurna
-            }
+            function sembunyikanSaran() { if (suggestBox) suggestBox.style.display = 'none'; if (searchBarContainer) searchBarContainer.style.borderRadius = "25px"; }
         });
     </script>
+</body>
 </html>

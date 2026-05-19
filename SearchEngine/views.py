@@ -163,3 +163,21 @@ def autocomplete_api(request):
         suggestions = DokumenAkademik.objects.filter(title__icontains=query).values_list('title', flat=True)[:5]
         return JsonResponse(list(suggestions), safe=False)
     return JsonResponse([], safe=False)
+
+def index(request):
+    # Hitung jumlah berdasarkan field 'source'
+    count_digilib = DokumenAkademik.objects.filter(source='DIGILIB').count()
+    count_lppm = DokumenAkademik.objects.filter(source='LPPM').count()
+
+    # Ambil tren
+    try:
+        top_trends = list(SearchTrend.objects.values('keyword').annotate(total=Count('keyword')).order_by('-total')[:5])
+    except Exception:
+        top_trends = []
+
+    context = {
+        'top_trends': top_trends,
+        'jumlah_digilib': f"{count_digilib:,}".replace(',', '.'),
+        'jumlah_lppm': f"{count_lppm:,}".replace(',', '.')
+    }
+    return render(request, 'index.html', context)

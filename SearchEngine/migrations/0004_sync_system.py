@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         # ⚠️ GANTI TULISAN DI BAWAH INI SESUAI NAMA FILE 0003 LO DI VSCODE LAPTOP
-        ('SearchEngine', '0003_dokumenakademik_searchengin_search__5181e3_gin.py'),
+        ('SearchEngine', '0003_dokumenakademik_searchengin_search__5181e3_gin'),
     ]
 
     operations = [

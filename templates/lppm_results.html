@@ -67,6 +67,17 @@
         body.dark-mode .suggestion-item:hover { background-color: #3c4043; }
         /* ======================== */
 
+        /* === GAYA BARU UNTUK STICKY NAVBAR & SEARCH BAR === */
+        #searchForm {
+            position: sticky;
+            top: 0;
+            z-index: 999; /* Agar navbar dan search selalu berada di atas konten hasil */
+            background-color: #ffffff; /* Agar konten yang di-scroll di belakangnya tidak terlihat */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sedikit bayangan estetik saat di-scroll */
+            transition: background-color 0.3s;
+        }
+        /* ================================================== */
+
         /* === TEMA MODE GELAP (DARK MODE) === */
         body.dark-mode { background-color: #202124; color: #e8eaed; }
         body.dark-mode .top-nav { border-bottom: 1px solid #3c4043; background: #202124; }
@@ -87,9 +98,94 @@
         /* === WARNA HIGHLIGHT PENCARIAN === */
         mark.highlight { background-color: #ffeb3b; color: #202124; padding: 0 2px; border-radius: 2px; font-weight: bold; box-shadow: none; }
         body.dark-mode mark.highlight { background-color: #fbc02d; color: #121212; }
+
+        /* === GAYA BARU UNTUK HASIL TIDAK DITEMUKAN === */
+        .no-results-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        body.dark-mode .no-results-img {
+            filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.5));
+        }
+
+        body.dark-mode .no-results-text { color: #bdc1c6; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Overlay Loading */
+        #loading-overlay {
+            display: none; /* Sembunyi secara default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 2000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Animasi berputar untuk logo */
+        .loader-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Logo Unila di tengah (tetap diam) */
+        .static-logo {
+            width: 70px;
+            height: 70px;
+            z-index: 2;
+        }
+
+        /* Cincin berputar */
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        body.dark-mode #loading-overlay {
+            background: rgba(32, 33, 36, 0.8);
+        }
+        body.dark-mode .spinner-ring { border: 6px solid #3c4043; border-top: 6px solid #8ab4f8; }
+
     </style>
 </head>
 <body>
+
+    <div id="loading-overlay">
+        <div class="loader-wrapper">
+            <div class="spinner-ring"></div>
+            <img src="{% static 'image/logo-unila.png' %}" alt="Loading" class="static-logo">
+        </div>
+        <p style="margin-top: 25px; font-weight: bold; color: #1a73e8;">Sedang mencari dokumen...</p>
+    </div>
 
     <form action="/search/" method="GET" id="searchForm">
         <div class="top-nav">
@@ -179,8 +275,11 @@
             {% endfor %}
         </div>
 
-        {% if total_hasil == 0 %}
-            <p style="color: #5f6368; font-size: 1.1rem;">Penelusuran lokal tidak menemukan dokumen apa pun.</p>
+       {% if total_hasil == 0 %}
+            <div class="no-results-container">
+                <p class="no-results-text" style="font-size: 0.95rem; color: #70757a; margin-top: 10px;">
+                    Maaf, kata kunci yang Anda cari tidak ditemukan. Silakan coba kata kunci lain atau periksa ejaan Anda.
+                </p>
         {% endif %}
 
         {% if page_obj.has_other_pages %}
@@ -331,6 +430,16 @@
             if (suggestBox) suggestBox.style.display = 'none';
             if (searchBarContainer) searchBarContainer.style.borderRadius = "24px";
         }
+        
+        // Menampilkan loading saat form dikirim
+        document.getElementById('searchForm').addEventListener('submit', function() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        });
+
+        // Pastikan loading hilang jika halaman selesai dimuat (jika ada error navigasi)
+        window.addEventListener('pageshow', function() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        });
     </script>
 </body>
 </html>
