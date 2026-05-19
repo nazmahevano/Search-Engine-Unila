@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portal Pencarian Karya Ilmiah, Skripsi, dan Penelitian Universitas Lampung melalui Digilib dan LPPM.">
     <title>Search Engine Skripsi</title>
     <link rel="icon" href="{% static 'image/logo-unila.png' %}" type="image/png">
     <style>
@@ -13,7 +14,9 @@
         header { padding: 20px 40px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #ebebeb; }
         .logo-nav { width: 40px; }
         .main-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 80%; max-width: 600px; margin: 0 auto; text-align: center; }
-        footer { padding: 20px; text-align: center; color: #777; font-size: 0.8rem; border-top: 1px solid #ebebeb; background: #f8f9fa; }
+        
+        /* Perbaikan kontras warna footer dari #777 menjadi #5f6368 */
+        footer { padding: 20px; text-align: center; color: #5f6368; font-size: 0.8rem; border-top: 1px solid #ebebeb; background: #f8f9fa; }
 
         /* Loading */
         #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 2000; justify-content: center; align-items: center; }
@@ -24,7 +27,7 @@
         h1 { font-size: 2.5rem; font-weight: bold; margin-bottom: 2rem; color: blue; }
         form { width: 100%; display: flex; justify-content: center; }
         .search-bar { background: white; border-radius: 25px; border: 1px solid #ccc; width: 100%; max-width: 500px; padding: 5px 15px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; }
-        .search-icon { font-size: 1.2rem; color: #777; padding-right: 15px; border-right: 1px solid #ccc; margin-right: 15px; height: 25px; display: flex; align-items: center; justify-content: center; }
+        .search-icon { font-size: 1.2rem; color: #5f6368; padding-right: 15px; border-right: 1px solid #ccc; margin-right: 15px; height: 25px; display: flex; align-items: center; justify-content: center; }
         .search-input { flex: 1; border: none !important; outline: none !important; padding: 10px; font-size: 1.1rem; background: transparent; box-shadow: none !important; width: 100%; color: #333; }
         .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background-color: #ffffff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 25px 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 99; overflow: hidden; text-align: left; margin-top: 1px; }
         .suggestion-item { padding: 10px 20px; cursor: pointer; color: #333; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 10px; }
@@ -57,19 +60,19 @@
 </head>
 <body>
     <header>
-        <img src="{% static 'image/logo-unila.png' %}" class="logo-nav" alt="Logo">
+        <img src="{% static 'image/logo-unila.png' %}" class="logo-nav" alt="Logo Universitas Lampung">
         <span style="font-weight: bold; color: blue;">Portal Pencarian Karya Ilmiah Universitas Lampung</span>
     </header>
 
     <div id="loading-overlay"><div class="spinner-ring-only"></div></div>
 
-    <div class="main-container">
+    <main class="main-container">
         <h1 id="animated-title">Mulai Pencarian</h1>
         
         <form action="/search/" method="GET" id="mainSearchForm">
             <div class="search-bar" id="search-bar-container">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="search-input" class="search-input" name="q" autocomplete="off" placeholder="Masukkan kata kunci pencarian...">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="search-input" class="search-input" name="q" autocomplete="off" placeholder="Masukkan kata kunci pencarian..." aria-label="Kolom pencarian karya ilmiah">
                 <div id="autocomplete-list" class="autocomplete-suggestions" style="display: none;"></div>
             </div>
         </form>
@@ -91,15 +94,15 @@
 
         <div class="services-container">
             <a href="javascript:void(0)" onclick="cariDenganSumber('digilib')" class="service-tile" style="text-decoration: none;">
-                <div class="icon-container"><img src="{% static 'image/logo-unila.png' %}" style="width: 50px;"></div>
+                <div class="icon-container"><img src="{% static 'image/logo-unila.png' %}" style="width: 50px;" alt="Ikon Database Digilib"></div>
                 <p>Digilib</p>
             </a>
             <a href="javascript:void(0)" onclick="cariDenganSumber('lppm')" class="service-tile" style="text-decoration: none;">
-                <div class="icon-container"><img src="{% static 'image/LPPM-UNILA-LOGGO.png' %}" style="width: 50px;"></div>
+                <div class="icon-container"><img src="{% static 'image/LPPM-UNILA-LOGGO.png' %}" style="width: 50px;" alt="Ikon Database LPPM Unila"></div>
                 <p>LPPM Unila</p>
             </a>
         </div>
-    </div>
+    </main>
 
     <footer>&copy; Tim Pengembang, 2026. Semua hak dilindungi.</footer>
 

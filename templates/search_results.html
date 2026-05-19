@@ -3,6 +3,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hasil pencarian karya ilmiah, skripsi, dan jurnal dari semua database Universitas Lampung.">
     <title>
         {% if sumber == 'semua' %}Hasil Pencarian Semua Database: {{ query }}
         {% else %}Hasil Pencarian Digilib: {{ query }}{% endif %}
@@ -22,10 +24,11 @@
         
         .db-icons { display: flex; gap: 15px; justify-content: center; }
         .db-icons input[type="radio"] { display: none; }
-        .db-icons label { cursor: pointer; opacity: 0.5; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; font-size: 0.85rem; color: #5f6368; padding: 10px 15px; border-radius: 12px; }
+        /* Aksesibilitas: Menghapus opacity: 0.5 agar warna abu-abu #5f6368 cukup kontras dengan background */
+        .db-icons label { cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; font-size: 0.85rem; color: #5f6368; padding: 10px 15px; border-radius: 12px; }
         .db-icons label img { width: 35px; height: 35px; margin-bottom: 5px; object-fit: contain; }
-        .db-icons label:hover { opacity: 1; background-color: #f1f3f4; }
-        .db-icons input[type="radio"]:checked + label { opacity: 1; font-weight: bold; color: #1a73e8; background-color: #e8f0fe; }
+        .db-icons label:hover { background-color: #f1f3f4; }
+        .db-icons input[type="radio"]:checked + label { font-weight: bold; color: #1a73e8; background-color: #e8f0fe; }
 
         .dropdown { position: relative; display: inline-block; }
         .dropdown-content { display: none; position: absolute; right: 0; top: 40px; background-color: #ffffff; min-width: 250px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); border: 1px solid #dfe1e5; padding: 20px; z-index: 100; border-radius: 15px; }
@@ -50,7 +53,8 @@
         .meta { color: #545454; font-size: 0.85rem; margin-bottom: 6px; } 
         .abstract { color: #4d5156; font-size: 0.95rem; line-height: 1.6; } 
         
-        .teks-jumlah-hasil { color: #70757a; font-size: 0.95rem; margin-bottom: 25px; }
+        /* Aksesibilitas: Menggelapkan sedikit teks agar lolos kontras minimum */
+        .teks-jumlah-hasil { color: #5f6368; font-size: 0.95rem; margin-bottom: 25px; }
 
         /* === CSS AUTOCOMPLETE === */
         .search-input-box { position: relative; }
@@ -62,12 +66,11 @@
         #searchForm {
             position: sticky;
             top: 0;
-            z-index: 999; /* Agar navbar dan search selalu berada di atas konten hasil */
-            background-color: #ffffff; /* Agar konten yang di-scroll di belakangnya tidak terlihat */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sedikit bayangan estetik saat di-scroll */
+            z-index: 999; 
+            background-color: #ffffff; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
             transition: background-color 0.3s;
         }
-        /* ================================================== */
         
         body.dark-mode .autocomplete-suggestions { background-color: #303134; border-color: #5f6368; box-shadow: 0 4px 6px rgba(0,0,0,.3); }
         body.dark-mode .suggestion-item { color: #e8eaed; }
@@ -92,10 +95,8 @@
         mark.highlight { background-color: #ffeb3b; color: #202124; padding: 0 2px; border-radius: 2px; font-weight: bold; box-shadow: none; }
         body.dark-mode mark.highlight { background-color: #fbc02d; color: #121212; }
         
-        /* Sticky form juga perlu warna gelap saat dark mode */
         body.dark-mode #searchForm { background-color: #202124; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
 
-        /* === GAYA BARU UNTUK HASIL TIDAK DITEMUKAN === */
         .no-results-container {
             display: flex;
             flex-direction: column;
@@ -118,9 +119,8 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Overlay Loading */
         #loading-overlay {
-            display: none; /* Sembunyi secara default */
+            display: none; 
             position: fixed;
             top: 0;
             left: 0;
@@ -133,7 +133,6 @@
             align-items: center;
         }
 
-        /* Animasi berputar untuk logo */
         .loader-wrapper {
             position: relative;
             width: 120px;
@@ -143,14 +142,12 @@
             align-items: center;
         }
 
-        /* Logo Unila di tengah (tetap diam) */
         .static-logo {
             width: 70px;
             height: 70px;
             z-index: 2;
         }
 
-        /* Cincin berputar */
         .spinner-ring {
             position: absolute;
             width: 100%;
@@ -182,83 +179,85 @@
         <p style="margin-top: 25px; font-weight: bold; color: #1a73e8;">Sedang mencari dokumen...</p>
     </div>
 
-    <form action="/search/" method="GET" id="searchForm">
-        <div class="top-nav">
-            <div style="display: flex; gap: 10px;">
-                <a href="/" class="nav-btn">🏠 Kembali</a>
-                <button type="button" class="nav-btn" onclick="toggleDarkMode()" id="btn-dark-mode">🌙 Mode Gelap</button>
-            </div>
-
-            <div class="db-center-box">
-                <button type="button" class="db-toggle-btn" onclick="toggleDbMenu()">
-                    Database: <span style="font-weight: bold; color: inherit;">
-                        {% if sumber == 'semua' %}Semua Database{% else %}Digilib Skripsi{% endif %}
-                    </span>
-                </button>
-                
-                <div id="dbDropdownMenu" class="db-dropdown">
-                    <div class="db-icons">
-                        <input type="radio" name="sumber" id="db_semua" value="semua" {% if sumber == 'semua' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
-                        <label for="db_semua">
-                            <div style="width:35px; height:35px; background:#f1f3f4; border-radius:50%; color:#5f6368; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;">🌐</div> Semua
-                        </label>
-
-                        <input type="radio" name="sumber" id="db_digilib" value="digilib" {% if sumber == 'digilib' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
-                        <label for="db_digilib">
-                            <img src="{% static 'image/logo-unila.png' %}" alt="Digilib"> Digilib
-                        </label>
-
-                        <input type="radio" name="sumber" id="db_lppm" value="lppm" {% if sumber == 'lppm' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
-                        <label for="db_lppm">
-                            <div style="width:35px; height:35px; background:#fce8e6; border-radius:50%; color:#d93025; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;">🏢</div> LPPM
-                        </label>
-                    </div>
+    <header>
+        <form action="/search/" method="GET" id="searchForm" role="search">
+            <div class="top-nav">
+                <div style="display: flex; gap: 10px;">
+                    <a href="/" class="nav-btn">🏠 Kembali</a>
+                    <button type="button" class="nav-btn" onclick="toggleDarkMode()" id="btn-dark-mode">🌙 Mode Gelap</button>
                 </div>
-            </div>
 
-            <div class="dropdown">
-                <button type="button" class="nav-btn" onclick="toggleFilterMenu()">▼ Filter Pencarian</button>
-                <div id="filterMenu" class="dropdown-content">
-                    <div class="filter-group">
-                        <label>Fakultas:</label>
-                        <select name="fakultas" id="input_fakultas" class="filter-input">
-                            <option value="">Semua Fakultas</option>
-                            <option value="Hukum" {% if fakultas == 'Hukum' %}selected{% endif %}>Hukum</option>
-                            <option value="Teknik" {% if fakultas == 'Teknik' %}selected{% endif %}>Teknik</option>
-                            <option value="Ekonomi" {% if fakultas == 'Ekonomi' %}selected{% endif %}>Ekonomi & Bisnis</option>
-                            <option value="Pertanian" {% if fakultas == 'Pertanian' %}selected{% endif %}>Pertanian</option>
-                            <option value="Keguruan" {% if fakultas == 'Keguruan' %}selected{% endif %}>Keguruan & Ilmu Pendidikan</option>
-                            <option value="Kedokteran" {% if fakultas == 'Kedokteran' %}selected{% endif %}>Kedokteran</option>
-                            <option value="Ilmu Sosial" {% if fakultas == 'Ilmu Sosial' %}selected{% endif %}>Ilmu Sosial & Ilmu Politik</option>
-                            <option value="MIPA" {% if fakultas == 'MIPA' %}selected{% endif %}>MIPA</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Rentang Tahun:</label>
-                        <div style="display:flex; gap:10px;">
-                            <input type="number" name="tahun_min" id="input_tahun_min" class="filter-input" placeholder="Dari" value="{{ tahun_min }}">
-                            <input type="number" name="tahun_max" id="input_tahun_max" class="filter-input" placeholder="Sampai" value="{{ tahun_max }}">
+                <div class="db-center-box">
+                    <button type="button" class="db-toggle-btn" onclick="toggleDbMenu()">
+                        Database: <span style="font-weight: bold; color: inherit;">
+                            {% if sumber == 'semua' %}Semua Database{% else %}Digilib Skripsi{% endif %}
+                        </span>
+                    </button>
+                    
+                    <div id="dbDropdownMenu" class="db-dropdown">
+                        <div class="db-icons">
+                            <input type="radio" name="sumber" id="db_semua" value="semua" {% if sumber == 'semua' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
+                            <label for="db_semua">
+                                <div style="width:35px; height:35px; background:#f1f3f4; border-radius:50%; color:#5f6368; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;" aria-hidden="true">🌐</div> Semua
+                            </label>
+
+                            <input type="radio" name="sumber" id="db_digilib" value="digilib" {% if sumber == 'digilib' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
+                            <label for="db_digilib">
+                                <img src="{% static 'image/logo-unila.png' %}" alt="Ikon Database Digilib"> Digilib
+                            </label>
+
+                            <input type="radio" name="sumber" id="db_lppm" value="lppm" {% if sumber == 'lppm' %}checked{% endif %} onchange="document.getElementById('searchForm').submit();">
+                            <label for="db_lppm">
+                                <div style="width:35px; height:35px; background:#fce8e6; border-radius:50%; color:#d93025; display:flex; justify-content:center; align-items:center; margin-bottom:5px; font-size: 1.2rem;" aria-hidden="true">🏢</div> LPPM
+                            </label>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 10px; margin-top: 20px;">
-                        <button type="button" onclick="resetFilter()" style="flex: 1; padding:10px; background:#f8f9fa; color:#3c4043; border:1px solid #dfe1e5; border-radius:5px; cursor:pointer; font-weight: bold;">Reset</button>
-                        <button type="submit" style="flex: 2; padding:10px; background:#1a73e8; color:white; border:none; border-radius:5px; cursor:pointer; font-weight: bold;">Terapkan</button>
+                </div>
+
+                <div class="dropdown">
+                    <button type="button" class="nav-btn" onclick="toggleFilterMenu()">▼ Filter Pencarian</button>
+                    <div id="filterMenu" class="dropdown-content">
+                        <div class="filter-group">
+                            <label>Fakultas:</label>
+                            <select name="fakultas" id="input_fakultas" class="filter-input" aria-label="Filter berdasarkan fakultas">
+                                <option value="">Semua Fakultas</option>
+                                <option value="Hukum" {% if fakultas == 'Hukum' %}selected{% endif %}>Hukum</option>
+                                <option value="Teknik" {% if fakultas == 'Teknik' %}selected{% endif %}>Teknik</option>
+                                <option value="Ekonomi" {% if fakultas == 'Ekonomi' %}selected{% endif %}>Ekonomi & Bisnis</option>
+                                <option value="Pertanian" {% if fakultas == 'Pertanian' %}selected{% endif %}>Pertanian</option>
+                                <option value="Keguruan" {% if fakultas == 'Keguruan' %}selected{% endif %}>Keguruan & Ilmu Pendidikan</option>
+                                <option value="Kedokteran" {% if fakultas == 'Kedokteran' %}selected{% endif %}>Kedokteran</option>
+                                <option value="Ilmu Sosial" {% if fakultas == 'Ilmu Sosial' %}selected{% endif %}>Ilmu Sosial & Ilmu Politik</option>
+                                <option value="MIPA" {% if fakultas == 'MIPA' %}selected{% endif %}>MIPA</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Rentang Tahun:</label>
+                            <div style="display:flex; gap:10px;">
+                                <input type="number" name="tahun_min" id="input_tahun_min" class="filter-input" placeholder="Dari" value="{{ tahun_min }}" aria-label="Filter tahun minimal">
+                                <input type="number" name="tahun_max" id="input_tahun_max" class="filter-input" placeholder="Sampai" value="{{ tahun_max }}" aria-label="Filter tahun maksimal">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button type="button" onclick="resetFilter()" style="flex: 1; padding:10px; background:#f8f9fa; color:#3c4043; border:1px solid #dfe1e5; border-radius:5px; cursor:pointer; font-weight: bold;">Reset</button>
+                            <button type="submit" style="flex: 2; padding:10px; background:#1a73e8; color:white; border:none; border-radius:5px; cursor:pointer; font-weight: bold;">Terapkan</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="search-area">
-            <div class="search-input-box">
-                <input type="text" id="search-input" name="q" value="{{ query }}" autocomplete="off" placeholder="Cari skripsi atau jurnal...">
-                <button type="submit">🔍</button>
-                
-                <div id="autocomplete-list" class="autocomplete-suggestions" style="display: none;"></div>
+            <div class="search-area">
+                <div class="search-input-box">
+                    <input type="text" id="search-input" name="q" value="{{ query }}" autocomplete="off" placeholder="Cari skripsi atau jurnal..." aria-label="Kolom pencarian karya ilmiah">
+                    <button type="submit" aria-label="Cari Dokumen">🔍</button>
+                    
+                    <div id="autocomplete-list" class="autocomplete-suggestions" style="display: none;"></div>
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </header>
 
-    <div class="results-area">
+    <main class="results-area">
         
         {% if query %}
             <div class="teks-jumlah-hasil">
@@ -294,13 +293,14 @@
 
         {% if total_hasil == 0 %}
             <div class="no-results-container">
-                <p class="no-results-text" style="font-size: 0.95rem; color: #70757a; margin-top: 10px;">
+                <p class="no-results-text" style="font-size: 0.95rem; color: #5f6368; margin-top: 10px;">
                     Maaf, kata kunci yang Anda cari tidak ditemukan. Silakan coba kata kunci lain atau periksa ejaan Anda.
                 </p>
+            </div>
         {% endif %}
 
         {% if page_obj.has_other_pages %}
-        <div class="pagination" style="margin-top: 40px; display: flex; justify-content: center; gap: 8px; align-items: center;">
+        <nav class="pagination" style="margin-top: 40px; display: flex; justify-content: center; gap: 8px; align-items: center;" aria-label="Navigasi Halaman">
             {% if page_obj.has_previous %}
                 <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page=1" class="nav-btn">&laquo; Awal</a>
                 <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.previous_page_number }}" class="nav-btn">Sebelumnya</a>
@@ -314,9 +314,9 @@
                 <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.next_page_number }}" class="nav-btn">Selanjutnya</a>
                 <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.paginator.num_pages }}" class="nav-btn">Akhir &raquo;</a>
             {% endif %}
-        </div>
+        </nav>
         {% endif %}
-    </div>
+    </main>
 
     <script>
         // ================= FITUR MODE GELAP & UI =================
@@ -398,7 +398,9 @@
         // Panggil fungsi saat halaman dimuat
         document.addEventListener("DOMContentLoaded", function() {
             applyHighlightAndSnippet('#local-results-container');
-            initMagnifyingGlass(); // Jalankan animasi kaca pembesar
+            
+            // Perbaikan JS: Fungsi ini dikomentari/dinonaktifkan karena tidak ada kodenya (mencegah error ReferenceError)
+            // initMagnifyingGlass(); 
         });
 
         // ================= FITUR SARAN KATA (AUTOCOMPLETE) =================
