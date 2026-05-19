@@ -65,6 +65,21 @@
                 <div id="autocomplete-list" class="autocomplete-suggestions" style="display: none;"></div>
             </div>
         </form>
+        
+        {% if top_trends %}
+            <div style="margin-top: 30px; text-align: center;">
+                <p style="color: #5f6368; font-size: 0.9rem;">Tren Pencarian Terpopuler:</p>
+                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                    {% for trend in top_trends %}
+                        <a href="/search/?q={{ trend.keyword }}" 
+                        style="padding: 5px 15px; border: 1px solid #dfe1e5; border-radius: 20px; 
+                                text-decoration: none; color: #1a73e8; font-size: 0.85rem; background: #f1f3f4;">
+                            {{ trend.keyword }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
 
         <p style="margin-top: 20px; color: #5f6368; font-size: 0.9rem;">
             Akses ribuan dokumen skripsi dan penelitian dosen dari Digilib dan LPPM Universitas Lampung
