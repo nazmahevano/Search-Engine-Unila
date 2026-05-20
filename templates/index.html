@@ -8,49 +8,186 @@
     <title>Search Engine Skripsi</title>
     <link rel="icon" href="{% static 'image/logo-unila.png' %}" type="image/png">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; background: white; color: blue; }
+        /* === BASE STYLES === */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            background: white; 
+            color: #333; /* Mengubah default dari 'blue' ke abu gelap agar kontras lebih baik */
+        }
         
         /* Layout Utama */
-        header { padding: 20px 40px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #ebebeb; }
-        .logo-nav { width: 40px; height: auto; }
-        .main-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 80%; max-width: 600px; margin: 0 auto; text-align: center; }
-        footer { padding: 20px; text-align: center; color: #5f6368; font-size: 0.8rem; border-top: 1px solid #ebebeb; background: #f8f9fa; }
+        header { 
+            padding: 15px 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 15px; 
+            border-bottom: 1px solid #ebebeb; 
+            flex-wrap: wrap; /* Memungkinkan elemen turun jika layar sempit */
+        }
+        .header-title {
+            font-weight: bold; 
+            color: #1a73e8; /* Warna biru yang lolos uji kontras Lighthouse */
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .logo-nav { 
+            width: 40px; 
+            height: 40px; 
+            object-fit: contain; 
+        }
+        
+        .main-container { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            width: 90%; /* Menggunakan 90% agar lebih lebar di HP */
+            max-width: 600px; 
+            margin: 0 auto; 
+            text-align: center; 
+            padding: 20px 0;
+        }
+        
+        footer { 
+            padding: 20px; 
+            text-align: center; 
+            color: #5f6368; 
+            font-size: 0.85rem; 
+            border-top: 1px solid #ebebeb; 
+            background: #f8f9fa; 
+        }
 
         /* Loading */
         #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 2000; justify-content: center; align-items: center; }
-        .spinner-ring-only { width: 80px; height: 80px; border: 8px solid #f3f3f3; border-top: 8px solid #1a73e8; border-radius: 50%; animation: spin 1s linear infinite; }
+        .spinner-ring-only { width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid #1a73e8; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Elemen Utama */
-        h1 { font-size: 2.5rem; font-weight: bold; margin-bottom: 2rem; color: blue; }
+        h1 { font-size: 2.2rem; font-weight: bold; margin-bottom: 1.5rem; color: #1a73e8; }
         form { width: 100%; display: flex; justify-content: center; }
-        .search-bar { background: white; border-radius: 25px; border: 1px solid #ccc; width: 100%; max-width: 500px; padding: 5px 15px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; }
-        .search-icon { font-size: 1.2rem; color: #5f6368; padding-right: 15px; border-right: 1px solid #ccc; margin-right: 15px; height: 25px; display: flex; align-items: center; justify-content: center; }
-        .search-input { flex: 1; border: none !important; outline: none !important; padding: 10px; font-size: 1.1rem; background: transparent; box-shadow: none !important; width: 100%; color: #333; }
-        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background-color: #ffffff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 25px 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 99; overflow: hidden; text-align: left; margin-top: 1px; }
-        .suggestion-item { padding: 10px 20px; cursor: pointer; color: #333; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 10px; }
-        .suggestion-item:hover { background-color: #f1f3f4; }
         
-        .services-container { margin-top: 3rem; display: flex; justify-content: center; gap: 2rem; }
+        .search-bar { background: white; border-radius: 30px; border: 1px solid #dfe1e5; width: 100%; max-width: 500px; padding: 5px 20px; display: flex; align-items: center; box-shadow: 0 1px 6px rgba(32,33,36,.28); position: relative; transition: box-shadow 0.3s; }
+        .search-bar:hover, .search-bar:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,.4); }
         
-        /* Perbaikan: Menyesuaikan gaya agar tag button tidak terlihat default (kotak abu-abu) */
-        .service-tile { background: white; border: none; cursor: pointer; font-family: inherit; border-radius: 12px; padding: 12px; text-align: center; width: 110px; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #333; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .service-tile:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-        .icon-container { width: 75px; height: 75px; display: flex; justify-content: center; align-items: center; margin-bottom: 5px; position: relative; }
-        .service-tile p { margin: 0; font-size: 0.95rem; line-height: 1.2; }
+        .search-icon { font-size: 1.2rem; color: #5f6368; padding-right: 15px; margin-right: 10px; display: flex; align-items: center; justify-content: center; }
+        .search-input { flex: 1; border: none !important; outline: none !important; padding: 12px 0; font-size: 1rem; background: transparent; width: 100%; color: #202124; }
         
-        @keyframes waveBounce { 0%, 40%, 100% { transform: translateY(0); } 20% { transform: translateY(-15px); } }
+        /* === CSS AUTOCOMPLETE === */
+        .autocomplete-suggestions { 
+            position: absolute; 
+            top: 100%; 
+            left: 0; 
+            right: 0; 
+            background-color: #ffffff; 
+            border: 1px solid #dfe1e5; 
+            border-top: none; 
+            border-radius: 0 0 24px 24px; 
+            box-shadow: 0 4px 6px rgba(32,33,36,.28); 
+            z-index: 99; 
+            /* Perbaikan: Batasi tinggi maksimal & tambahkan scroll jika saran sangat banyak */
+            max-height: 50vh; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            text-align: left; 
+            margin-top: 1px; 
+            box-sizing: border-box;
+        }
+        
+        .suggestion-item { 
+            padding: 12px 20px; 
+            cursor: pointer; 
+            color: #202124; 
+            font-size: 0.95rem; 
+            /* Perbaikan: Biarkan teks memanjang ke bawah (wrap) agar judul terbaca utuh */
+            white-space: normal; 
+            word-wrap: break-word;
+            line-height: 1.4;
+            display: flex; 
+            align-items: flex-start; /* Ikon 🔍 rata atas agar seimbang dengan teks 2 baris */
+            gap: 10px; 
+            border-bottom: 1px solid #f1f3f4; /* Garis pemisah tipis antar judul */
+        }
+        
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .suggestion-item:hover { 
+            background-color: #f1f3f4; 
+        }
+        body.dark-mode .suggestion-item { border-bottom-color: #3c4043; }
+        
+        /* Trends (Tap Targets diperbesar untuk Lighthouse) */
+        .trends-container { margin-top: 30px; text-align: center; }
+        .trends-wrapper { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px;}
+        .trend-link { 
+            display: inline-flex; 
+            align-items: center;
+            padding: 10px 18px; 
+            border: 1px solid #dfe1e5; 
+            border-radius: 25px; 
+            text-decoration: none; 
+            color: #1a73e8; 
+            font-size: 0.9rem; 
+            background: #f8f9fa;
+            min-height: 48px; /* Standard minimum tap target Lighthouse */
+            box-sizing: border-box;
+            transition: background 0.2s;
+        }
+        .trend-link:hover { background: #e8eaed; }
+
+        /* Services & Stats */
+        .stats-container { display: flex; justify-content: center; gap: 30px; margin-top: 20px; color: #5f6368; font-size: 0.95rem; }
+        .stat-value { font-weight: bold; color: #1a73e8; margin-left: 5px; }
+
+        .services-container { margin-top: 2.5rem; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+        .service-tile { background: white; border: 1px solid #ebebeb; cursor: pointer; font-family: inherit; border-radius: 12px; padding: 15px; text-align: center; width: 120px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #333; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .service-tile:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); border-color: transparent; }
+        .icon-container { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+        .icon-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .service-tile p { margin: 0; font-size: 0.95rem; font-weight: 500; }
+        
+        /* Animasi */
+        @keyframes waveBounce { 0%, 40%, 100% { transform: translateY(0); } 20% { transform: translateY(-10px); } }
         .waving-text span { display: inline-block; animation: waveBounce 1.5s infinite; }
         .waving-text.stop-anim span { animation: none !important; transform: translateY(0) !important; }
         
-        .stats-container { display: flex; justify-content: center; gap: 30px; margin-top: 20px; color: #5f6368; font-size: 0.9rem; }
-        .stat-value { font-weight: bold; color: #1a73e8; margin-left: 5px; }
+        /* === RESPONSIVE MEDIA QUERIES (Untuk HP & Tablet) === */
+        @media (max-width: 768px) {
+            .main-container { width: 95%; padding: 10px 0; }
+            h1 { font-size: 1.8rem; }
+            .header-title { font-size: 1rem; }
+            
+            .stats-container { gap: 15px; flex-direction: column; align-items: center; margin-top: 15px; }
+            .services-container { gap: 1.5rem; margin-top: 2rem; }
+            
+            .service-tile { width: 105px; height: 105px; padding: 10px; }
+            .icon-container { width: 50px; height: 50px; margin-bottom: 8px; }
+            .service-tile p { font-size: 0.85rem; }
+            
+            .search-bar { padding: 5px 15px; }
+            .search-icon { margin-right: 5px; padding-right: 10px; }
+            .search-input { font-size: 0.95rem; }
+        }
+
+        @media (max-width: 480px) {
+            header { flex-direction: column; gap: 8px; padding: 15px 10px; }
+            h1 { font-size: 1.5rem; }
+            .trend-link { font-size: 0.85rem; padding: 8px 15px; min-height: 44px; }
+        }
     </style>
 </head>
 <body>
     <header>
-        <img src="{% static 'image/logo-unila.png' %}" class="logo-nav" width="40" height="40" alt="Logo Universitas Lampung" fetchpriority="high">
-        <span style="font-weight: bold; color: blue;">Portal Pencarian Karya Ilmiah Universitas Lampung</span>
+        <img src="{% static 'image/logo-unila.png' %}" class="logo-nav" alt="Logo Universitas Lampung" fetchpriority="high">
+        <span class="header-title">Portal Pencarian Karya Ilmiah Universitas Lampung</span>
     </header>
 
     <div id="loading-overlay"><div class="spinner-ring-only"></div></div>
@@ -67,13 +204,11 @@
         </form>
         
         {% if top_trends %}
-            <div style="margin-top: 30px; text-align: center;">
-                <p style="color: #5f6368; font-size: 0.9rem;">Tren Pencarian Terpopuler:</p>
-                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <div class="trends-container">
+                <p style="color: #5f6368; font-size: 0.9rem; margin-bottom: 5px;">Tren Pencarian Terpopuler:</p>
+                <div class="trends-wrapper">
                     {% for trend in top_trends %}
-                        <a href="/search/?q={{ trend.keyword }}" 
-                        style="padding: 5px 15px; border: 1px solid #dfe1e5; border-radius: 20px; 
-                                text-decoration: none; color: #1a73e8; font-size: 0.85rem; background: #f1f3f4;">
+                        <a href="/search/?q={{ trend.keyword }}" class="trend-link">
                             {{ trend.keyword }}
                         </a>
                     {% endfor %}
@@ -81,7 +216,7 @@
             </div>
         {% endif %}
 
-        <p style="margin-top: 20px; color: #5f6368; font-size: 0.9rem;">
+        <p style="margin-top: 25px; color: #5f6368; font-size: 0.95rem; padding: 0 10px;">
             Akses ribuan dokumen skripsi dan penelitian dosen dari Digilib dan LPPM Universitas Lampung
         </p>
 
@@ -97,12 +232,12 @@
         </div>
 
         <div class="services-container">
-            <button type="button" onclick="cariDenganSumber('digilib')" class="service-tile">
-                <div class="icon-container"><img src="{% static 'image/logo-unila.png' %}" style="width: 50px; height: auto;" width="50" height="50" alt="Ikon Database Digilib" loading="lazy"></div>
+            <button type="button" onclick="cariDenganSumber('digilib')" class="service-tile" aria-label="Cari di Digilib">
+                <div class="icon-container"><img src="{% static 'image/logo-unila.png' %}" alt="Ikon Database Digilib" loading="lazy"></div>
                 <p>Digilib</p>
             </button>
-            <button type="button" onclick="cariDenganSumber('lppm')" class="service-tile">
-                <div class="icon-container"><img src="{% static 'image/LPPM-UNILA-LOGGO.png' %}" style="width: 50px; height: auto;" width="50" height="50" alt="Ikon Database LPPM Unila" loading="lazy"></div>
+            <button type="button" onclick="cariDenganSumber('lppm')" class="service-tile" aria-label="Cari di LPPM">
+                <div class="icon-container"><img src="{% static 'image/LPPM-UNILA-LOGGO.png' %}" alt="Ikon Database LPPM Unila" loading="lazy"></div>
                 <p>LPPM Unila</p>
             </button>
         </div>
@@ -158,14 +293,14 @@
                                     div.onclick = function() { searchInput.value = item; document.getElementById('mainSearchForm').submit(); };
                                     suggestBox.appendChild(div);
                                 });
-                                suggestBox.style.display = 'block'; searchBarContainer.style.borderRadius = "25px 25px 0 0";
+                                suggestBox.style.display = 'block'; searchBarContainer.style.borderRadius = "30px 30px 0 0";
                             } else { sembunyikanSaran(); }
                         }).catch(err => sembunyikanSaran());
                     } else { sembunyikanSaran(); }
                 });
                 document.addEventListener('click', function(e) { if (e.target !== searchInput) sembunyikanSaran(); });
             }
-            function sembunyikanSaran() { if (suggestBox) suggestBox.style.display = 'none'; if (searchBarContainer) searchBarContainer.style.borderRadius = "25px"; }
+            function sembunyikanSaran() { if (suggestBox) suggestBox.style.display = 'none'; if (searchBarContainer) searchBarContainer.style.borderRadius = "30px"; }
         });
     </script>
 </body>

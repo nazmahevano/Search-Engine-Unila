@@ -11,6 +11,7 @@
     <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
 
     <style>
+        /* === CSS DASAR (TIDAK DIUBAH, TAMPILAN LAPTOP TETAP AMAN) === */
         body { font-family: arial, sans-serif; background: #ffffff; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
         .top-nav { display: flex; justify-content: space-between; align-items: flex-start; padding: 15px 30px; border-bottom: 1px solid #ebebeb; position: relative; }
         .nav-btn { padding: 8px 16px; border: 1px solid #dfe1e5; border-radius: 20px; background: white; cursor: pointer; text-decoration: none; color: #3c4043; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
@@ -55,12 +56,51 @@
         .teks-jumlah-hasil { color: #5f6368; font-size: 0.95rem; margin-bottom: 25px; }
 
         /* === CSS AUTOCOMPLETE === */
-        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background-color: #ffffff; border: 1px solid #dfe1e5; border-top: none; border-radius: 0 0 24px 24px; box-shadow: 0 4px 6px rgba(32,33,36,.28); z-index: 99; overflow: hidden; text-align: left; margin-top: 1px; }
-        .suggestion-item { padding: 10px 20px; cursor: pointer; color: #202124; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 10px; }
-        .suggestion-item:hover { background-color: #f1f3f4; }
+        .autocomplete-suggestions { 
+            position: absolute; 
+            top: 100%; 
+            left: 0; 
+            right: 0; 
+            background-color: #ffffff; 
+            border: 1px solid #dfe1e5; 
+            border-top: none; 
+            border-radius: 0 0 24px 24px; 
+            box-shadow: 0 4px 6px rgba(32,33,36,.28); 
+            z-index: 99; 
+            /* Perbaikan: Batasi tinggi maksimal & tambahkan scroll jika saran sangat banyak */
+            max-height: 50vh; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            text-align: left; 
+            margin-top: 1px; 
+            box-sizing: border-box;
+        }
+        
+        .suggestion-item { 
+            padding: 12px 20px; 
+            cursor: pointer; 
+            color: #202124; 
+            font-size: 0.95rem; 
+            /* Perbaikan: Biarkan teks memanjang ke bawah (wrap) agar judul terbaca utuh */
+            white-space: normal; 
+            word-wrap: break-word;
+            line-height: 1.4;
+            display: flex; 
+            align-items: flex-start; /* Ikon 🔍 rata atas agar seimbang dengan teks 2 baris */
+            gap: 10px; 
+            border-bottom: 1px solid #f1f3f4; /* Garis pemisah tipis antar judul */
+        }
+        
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .suggestion-item:hover { 
+            background-color: #f1f3f4; 
+        }
+        body.dark-mode .suggestion-item { border-bottom-color: #3c4043; }
         
         /* === PERBAIKAN STICKY NAVBAR === */
-        /* Cukup taruh sticky di header, hapus id #searchForm dan padding <main> yang merusak layout */
         header {
             position: sticky;
             top: 0;
@@ -91,8 +131,6 @@
         body.dark-mode .autocomplete-suggestions { background-color: #303134; border-color: #5f6368; box-shadow: 0 4px 6px rgba(0,0,0,.3); }
         body.dark-mode .suggestion-item { color: #e8eaed; }
         body.dark-mode .suggestion-item:hover { background-color: #3c4043; }
-        
-        /* Pastikan background header ikut berubah saat mode gelap (Mencegah box putih!) */
         body.dark-mode header { background-color: #202124; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
 
         .no-results-container { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; margin: 0 auto; animation: fadeInUp 0.8s ease-out; }
@@ -107,6 +145,80 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         body.dark-mode #loading-overlay { background: rgba(32, 33, 36, 0.8); }
         body.dark-mode .spinner-ring { border: 6px solid #3c4043; border-top: 6px solid #8ab4f8; }
+
+        /* ====================================================================
+           MEDIA QUERIES (PERBAIKAN KHUSUS HP & SYARAT LIGHTHOUSE)
+           Kode di bawah ini HANYA aktif jika layar lebih kecil dari 768px
+           ==================================================================== */
+        @media (max-width: 768px) {
+            /* 1. Lighthouse: Memperbesar area sentuh khusus di HP (Min 48px) */
+            .nav-btn, .db-toggle-btn, .suggestion-item {
+                min-height: 48px;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .filter-input {
+                min-height: 48px;
+                box-sizing: border-box;
+            }
+
+            /* 2. Menyusun Ulang Navigasi Header Menjadi Tumpukan ke Bawah */
+            .top-nav {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            /* Tombol Kembali & Mode Gelap berjejer di baris pertama */
+            .top-nav > div:first-child {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+            }
+            .nav-btn { flex: 1; margin: 0 5px; }
+
+            /* Tombol Database memenuhi baris kedua */
+            .db-center-box { width: 100%; }
+            .db-toggle-btn { width: 100%; max-width: none; }
+
+            /* Tombol Filter memenuhi baris ketiga */
+            .dropdown { width: 100%; }
+            .dropdown > .nav-btn { width: 100%; margin: 0; }
+
+            /* 3. Dropdown Menu (Database & Filter) dibuat selebar layar HP */
+            .dropdown-content, .db-dropdown {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                width: 100%;
+                transform: none;
+                border-radius: 0 0 15px 15px;
+                box-sizing: border-box;
+                margin-top: 5px;
+                border-left: none;
+                border-right: none;
+            }
+
+            /* 4. Memperbaiki Padding & Margin Konten Utama */
+            .search-area { padding: 15px; }
+            .results-area { 
+                padding: 20px 15px;
+                max-width: 100%;
+            }
+
+            /* Memaksa Link URL panjang turun ke bawah agar tidak overflow */
+            .link-url { word-break: break-all; display: block; }
+        }
+
+        @media (max-width: 480px) {
+            .db-icons label { padding: 8px 10px; min-width: 60px; }
+            .pagination { flex-wrap: wrap; }
+            .pagination .nav-btn { flex-grow: 1; text-align: center; margin-bottom: 5px; }
+        }
     </style>
 </head>
 <body>
@@ -123,15 +235,15 @@
         <form action="/search/" method="GET" id="searchForm" role="search">
             <div class="top-nav">
                 <div style="display: flex; gap: 10px;">
-                    <a href="/" class="nav-btn">🏠 Kembali</a>
-                    <button type="button" class="nav-btn" onclick="toggleDarkMode()" id="btn-dark-mode">
+                    <a href="/" class="nav-btn" aria-label="Kembali ke Beranda">🏠 Kembali</a>
+                    <button type="button" class="nav-btn" onclick="toggleDarkMode()" id="btn-dark-mode" aria-label="Ganti Tema">
                         <i id="icon-dark-mode" class="fi fi-sr-moon" aria-hidden="true"></i>
                         <span id="text-dark-mode">Mode Gelap</span>
                     </button>
                 </div>
 
                 <div class="db-center-box">
-                    <button type="button" class="db-toggle-btn" onclick="toggleDbMenu()">
+                    <button type="button" class="db-toggle-btn" onclick="toggleDbMenu()" aria-expanded="false">
                         Database: <span style="font-weight: bold; color: inherit;">LPPM Unila</span>
                     </button>
                     
@@ -156,7 +268,7 @@
                 </div>
 
                 <div class="dropdown">
-                    <button type="button" class="nav-btn" onclick="toggleFilterMenu()">▼ Filter Pencarian</button>
+                    <button type="button" class="nav-btn" onclick="toggleFilterMenu()" aria-expanded="false">▼ Filter Pencarian</button>
                     <div id="filterMenu" class="dropdown-content">
                         <div class="filter-group">
                             <label>Rentang Tahun:</label>
@@ -166,8 +278,8 @@
                             </div>
                         </div>
                         <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button type="button" onclick="resetFilter()" style="flex: 1; padding:10px; background:#f8f9fa; color:#3c4043; border:1px solid #dfe1e5; border-radius:5px; cursor:pointer; font-weight: bold;">Reset</button>
-                            <button type="submit" style="flex: 2; padding:10px; background:#1a73e8; color:white; border:none; border-radius:5px; cursor:pointer; font-weight: bold;">Terapkan</button>
+                            <button type="button" class="nav-btn" onclick="resetFilter()" style="flex: 1; padding:10px; background:#f8f9fa; color:#3c4043; border:1px solid #dfe1e5; border-radius:5px; cursor:pointer; font-weight: bold;">Reset</button>
+                            <button type="submit" class="nav-btn" style="flex: 2; padding:10px; background:#1a73e8; color:white; border:none; border-radius:5px; cursor:pointer; font-weight: bold;">Terapkan</button>
                         </div>
                     </div>
                 </div>
@@ -221,8 +333,8 @@
         {% if page_obj.has_other_pages %}
         <nav class="pagination" style="margin-top: 40px; display: flex; justify-content: center; gap: 8px; align-items: center;" aria-label="Navigasi Halaman">
             {% if page_obj.has_previous %}
-                <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page=1" class="nav-btn">&laquo; Awal</a>
-                <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.previous_page_number }}" class="nav-btn">Sebelumnya</a>
+                <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page=1" class="nav-btn" aria-label="Halaman Awal">&laquo; Awal</a>
+                <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.previous_page_number }}" class="nav-btn" aria-label="Halaman Sebelumnya">Sebelumnya</a>
             {% endif %}
 
             <span class="nav-btn" style="background: #e8f0fe; border: 1px solid #1a73e8; color: #1a73e8; cursor: default;">
@@ -230,8 +342,8 @@
             </span>
 
             {% if page_obj.has_next %}
-                <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.next_page_number }}" class="nav-btn">Selanjutnya</a>
-                <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.paginator.num_pages }}" class="nav-btn">Akhir &raquo;</a>
+                <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.next_page_number }}" class="nav-btn" aria-label="Halaman Selanjutnya">Selanjutnya</a>
+                <a href="?q={{ query }}&sumber={{ sumber }}&fakultas={{ fakultas }}&tahun_min={{ tahun_min }}&tahun_max={{ tahun_max }}&page={{ page_obj.paginator.num_pages }}" class="nav-btn" aria-label="Halaman Terakhir">Akhir &raquo;</a>
             {% endif %}
         </nav>
         {% endif %}
@@ -241,11 +353,9 @@
         // ================= FITUR MODE GELAP & UI =================
         const body = document.body;
         
-        // Ambil text dan ikon secara terpisah
         const btnDarkModeText = document.getElementById('text-dark-mode');
         const btnDarkModeIcon = document.getElementById('icon-dark-mode');
 
-        // Cek LocalStorage saat halaman pertama dimuat
         if (localStorage.getItem('theme') === 'dark') { 
             body.classList.add('dark-mode'); 
             btnDarkModeText.innerText = 'Mode Terang';
@@ -271,8 +381,21 @@
             document.getElementById('searchForm').submit();
         }
 
-        function toggleDbMenu() { document.getElementById("dbDropdownMenu").classList.toggle("show"); document.getElementById("filterMenu").classList.remove("show"); }
-        function toggleFilterMenu() { document.getElementById("filterMenu").classList.toggle("show"); document.getElementById("dbDropdownMenu").classList.remove("show"); }
+        function toggleDbMenu() { 
+            const menu = document.getElementById("dbDropdownMenu");
+            const btn = document.querySelector('.db-toggle-btn');
+            menu.classList.toggle("show"); 
+            btn.setAttribute('aria-expanded', menu.classList.contains("show"));
+            document.getElementById("filterMenu").classList.remove("show"); 
+        }
+        
+        function toggleFilterMenu() { 
+            const menu = document.getElementById("filterMenu");
+            const btn = document.querySelector('.dropdown .nav-btn');
+            menu.classList.toggle("show"); 
+            btn.setAttribute('aria-expanded', menu.classList.contains("show"));
+            document.getElementById("dbDropdownMenu").classList.remove("show"); 
+        }
 
         window.onclick = function(event) {
             if (!event.target.closest('.db-center-box')) { const dbMenu = document.getElementById("dbDropdownMenu"); if(dbMenu) dbMenu.classList.remove('show'); }
@@ -328,7 +451,6 @@
             }
         }
 
-        // Panggil Highlight saat halaman dimuat
         document.addEventListener("DOMContentLoaded", function() {
             applyHighlightAndSnippet('#local-results-container');
         });
@@ -381,12 +503,10 @@
             if (searchBarContainer) searchBarContainer.style.borderRadius = "24px";
         }
 
-        // Menampilkan loading saat form dikirim
         document.getElementById('searchForm').addEventListener('submit', function() {
             document.getElementById('loading-overlay').style.display = 'flex';
         });
 
-        // Pastikan loading hilang jika halaman selesai dimuat (jika ada error navigasi)
         window.addEventListener('pageshow', function() {
             document.getElementById('loading-overlay').style.display = 'none';
         });
