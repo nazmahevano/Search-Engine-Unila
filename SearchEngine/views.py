@@ -1,7 +1,8 @@
 import time
+import json
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
-from django.db.models import F, Q, Case, When, Value, FloatField, Count
+from django.db.models import F, Q, Case, When, Value, FloatField, Count, Max
 from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
@@ -181,3 +182,28 @@ def index(request):
         'jumlah_lppm': f"{count_lppm:,}".replace(',', '.')
     }
     return render(request, 'index.html', context)
+
+def dashboard_analitik_view(request):
+    # 1. Menghitung total seluruh aktivitas pencarian
+    total_pencarian = SearchTrend.objects.count()
+    
+    # 2. Mengambil 10 kata kunci teratas untuk Grafik Batang (tetap seperti kemarin)
+    top_keywords = SearchTrend.objects.values('keyword').annotate(total=Count('id')).order_by('-total')[:10]
+    labels = [item['keyword'] for item in top_keywords]
+    data_frekuensi = [item['total'] for item in top_keywords]
+    
+    # 3. PERBAIKAN UTAMA: Mengelompokkan kata kunci unik, dihitung jumlahnya, 
+    # dan diurutkan berdasarkan waktu pencarian paling terbaru.
+    riwayat_berdasarkan_kueri = SearchTrend.objects.values('keyword').annotate(
+        total_dicari=Count('id'),
+        waktu_terakhir=Max('created_at')
+    ).order_by('-waktu_terakhir')[:50]  # Menampilkan 50 kata kunci unik terbaru
+    
+    context = {
+        'total_pencarian': total_pencarian,
+        'top_keywords_json': json.dumps(labels),
+        'data_frekuensi_json': json.dumps(data_frekuensi),
+        'riwayat_berdasarkan_kueri': riwayat_berdasarkan_kueri,  # Data baru untuk tabel
+    }
+    
+    return render(request, 'dashboard_analitik.html', context)

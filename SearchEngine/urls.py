@@ -20,4 +20,6 @@ urlpatterns = [
 
     # 5. FITUR AUTOCOMPLETE
     path('api/autocomplete/', views.autocomplete_api, name='autocomplete'),
+    
+    path('dashboard-pencarian/', views.dashboard_analitik_view, name='dashboard_pencarian'),
 ]

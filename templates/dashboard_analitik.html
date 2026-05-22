@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Analitik Pencarian - Unila</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #1a73e8;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        /* Gaya UI untuk Kartu (Cards) */
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .stats-card h2 { margin: 0; color: #5f6368; font-size: 1.1rem; font-weight: 500;}
+        .stats-card .number { font-size: 3rem; font-weight: bold; color: #1a73e8; margin-top: 5px; }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card h3 { margin-top: 0; color: #202124; border-bottom: 2px solid #f1f3f4; padding-bottom: 12px; }
+        
+        /* Gaya Tabel Modern */
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .styled-table thead tr {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            text-align: left;
+        }
+        .styled-table th, .styled-table td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .styled-table tbody tr:hover { background-color: #f8f9fa; }
+        .badge {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <h2 style="margin: 0; font-size: 1.3rem;">📊 Analytics Dashboard: Search Engine Unila</h2>
+        <a href="/" style="color: white; margin-left: auto; text-decoration: none; font-weight: bold; font-size: 0.95rem;">🏠 Kembali ke Beranda</a>
+    </div>
+
+    <div class="container">
+        <div class="stats-card">
+            <h2>Total Aktivitas Pencarian Keseluruhan</h2>
+            <div class="number">{{ total_pencarian }}</div>
+            <p style="color: #5f6368; font-size: 0.9rem; margin: 0;">kueri berhasil diproses oleh sistem</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Top 10 Tren Kata Kunci Terpopuler</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h3>Log Akses Pencarian Pengguna Terkini</h3>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Kata Kunci Pencarian</th>
+                            <th>Frekuensi Kueri</th>
+                            <th>Waktu Akses Terakhir</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for riwayat in riwayat_berdasarkan_kueri %}
+                        <tr>
+                            <td style="font-weight: bold; color: #3c4043;">{{ riwayat.keyword }}</td>
+                            <td>
+                                <span class="badge" style="background-color: #e8f0fe; color: #1a73e8; padding: 6px 12px; border-radius: 20px;">
+                                    {{ riwayat.total_dicari }}x dicari
+                                </span>
+                            </td>
+                            <td style="color: #5f6368;">{{ riwayat.waktu_terakhir|date:"d M Y - H:i:s" }} WIB</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: #5f6368;">Sistem belum mencatat adanya aktivitas pencarian.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            // Menginjeksi data JSON dari Backend Django ke dalam Script Frontend
+            const labels = {{ top_keywords_json|safe }};
+            const dataPoints = {{ data_frekuensi_json|safe }};
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Frekuensi Pencarian',
+                        data: dataPoints,
+                        backgroundColor: 'rgba(26, 115, 232, 0.8)',
+                        borderColor: 'rgba(26, 115, 232, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        hoverBackgroundColor: 'rgba(26, 115, 232, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false } // Menyembunyikan legenda agar desain lebih 'clean'
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
