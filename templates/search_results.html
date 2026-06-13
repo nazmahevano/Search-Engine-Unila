@@ -338,11 +338,11 @@
                     <h3 class="title"><a href="/detail/{{ item.id }}/" style="text-decoration: none;">{{ item.title }}</a></h3>
                     <div class="link-url">
                         {% if item.source == 'LPPM' %}
-                            🏢 LPPM Unila
+                            repository.lppm.unila.ac.id/{{ item.id }}
                         {% elif item.url_digilib %}
                             {{ item.url_digilib }}
                         {% else %}
-                            digilib.universitas.ac.id/skripsi/{{ item.id }}
+                            digilib.unila.ac.id/skripsi/{{ item.id }}
                         {% endif %}
                     </div>
                     <div class="meta">{{ item.author }} - {% if item.year %}{{ item.year }}{% else %}{{ item.date_release|date:"Y" }}{% endif %}</div>
