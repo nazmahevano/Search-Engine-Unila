@@ -135,11 +135,11 @@
 
                 {% if skripsi.source_url %}
                     <a href="{{ skripsi.source_url }}" target="_blank" class="btn-general {% if skripsi.source == 'LPPM' %}btn-lppm{% else %}btn-buka{% endif %}">
-                        {% if skripsi.source == 'LPPM' %}🔗 Buka Dokumen di LPPM{% else %}🔗 Buka Dokumen Asli{% endif %}
+                        {% if skripsi.source == 'LPPM' %}🔗 Buka Dokumen di LPPM{% else %}🔗 Buka Dokumen di Digilib Unila{% endif %}
                     </a>
                 {% elif skripsi.url_digilib %}
                     <a href="{{ skripsi.url_digilib }}" target="_blank" class="btn-general {% if skripsi.source == 'LPPM' %}btn-lppm{% else %}btn-buka{% endif %}">
-                        {% if skripsi.source == 'LPPM' %}🔗 Buka Dokumen di LPPM{% else %}🔗 Buka Dokumen di Digilib{% endif %}
+                        {% if skripsi.source == 'LPPM' %}🔗 Buka Dokumen di LPPM{% else %}🔗 Buka Dokumen di Digilib Unila{% endif %}
                     </a>
                 {% else %}
                     <button disabled class="btn-general disabled">
